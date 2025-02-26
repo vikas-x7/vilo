@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -8,14 +8,16 @@ datasource db {
 }
 
 model User {
-  id        Int           @id @default(autoincrement())
-  email     String        @unique
-  name      String?
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+
   latexDocs Latex[]
   portfolio Portfolio?
   roadmaps  UserRoadmap[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Latex {
@@ -37,14 +39,13 @@ model LatexVersion {
 }
 
 model Portfolio {
-  id         Int      @id @default(autoincrement())
-  userId     Int      @unique
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  template   String
-  data       Json
-  deployLink String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  data        Json
+  isPublished Boolean  @default(false)
+  userId      Int      @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Roadmap {
