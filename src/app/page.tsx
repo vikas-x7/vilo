@@ -1,7 +1,10 @@
-export default function Home() {
+import { Hero, Navbar } from "@/page/home/Homepage";
+
+export default function Page() {
   return (
-    <div className="">
-      <h1>hello world </h1>
+    <div>
+      <Navbar />
+      <Hero />
     </div>
   );
 }
