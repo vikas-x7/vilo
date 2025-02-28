@@ -7,18 +7,7 @@ export const Navbar = () => {
 
   return (
     <nav className="relative z-50 flex items-center justify-between px-6 md:px-10 py-4 bg-[#14120B] backdrop-blur-sm ">
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-stone-800 flex items-center justify-center">
-          <svg viewBox="0 0 24 24" className="w-4 h-4 text-white fill-current">
-            <path
-              d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-              stroke="white"
-              strokeWidth="2"
-              fill="none"
-            />
-          </svg>
-        </div>
-      </div>
+      <div className="flex items-center gap-2 text-white">vilo</div>
 
       <div className="hidden md:flex items-center gap-8">
         {["Solutions", "Use Cases", "Developers", "Resources", "Pricing"].map(
@@ -86,7 +75,7 @@ export const Hero = () => (
   <section className="relative min-h-[calc(100vh-64px)] bg-[#14120B] flex flex-col items-center justify-center px-6 text-center overflow-hidden">
     <div className="relative z-10 flex flex-col items-center max-w-3xl mx-auto">
       <div className="flex items-center gap-0 mb-8 border border-stone-300 rounded-sm overflow-hidden shadow-sm">
-        <span className="px-4 py-1.5 text-xs font-mono text-white/40 bg-[#f0ede7] border-r border-stone-300">
+        <span className="px-4 py-1.5 text-xs font-mono text-black bg-[#f0ede7] border-r border-stone-300">
           Introducing Orren
         </span>
         <a
@@ -104,7 +93,7 @@ export const Hero = () => (
         </a>
       </div>
 
-      <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white/40 leading-[1.05] tracking-tight mb-6 font-mono">
+      <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-7xl font-bold text-[#EDECEC] leading-[1.05] tracking-tight mb-6 font-mono">
         Meet your first
         <br />
         autonomous builder.
@@ -112,7 +101,6 @@ export const Hero = () => (
 
       <p className="text-sm sm:text-base text-stone-500 font-mono max-w-md leading-relaxed">
         Orren helps teams deploy AI operators that plan, execute, and scale
-        workflows — from sales to support — with a single prompt.
       </p>
 
       {/* CTA Buttons */}

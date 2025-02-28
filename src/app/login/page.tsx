@@ -1,7 +1,12 @@
 import React from "react";
+import LoginPage from "./auth/Login";
 
 function page() {
-  return <div>login page </div>;
+  return (
+    <div>
+      <LoginPage />
+    </div>
+  );
 }
 
 export default page;
