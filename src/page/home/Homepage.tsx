@@ -103,8 +103,6 @@ export const Hero = () => (
         Write with precision, showcase with confidence, and learn with clarity -
         all inside <br /> one focused platform built for developers.
       </p>
-
-      {/* CTA Buttons */}
     </div>
     <div>
       <img
@@ -120,7 +118,7 @@ export const Hero = () => (
         architecto beatae repellat facilis laboriosam quidem atque voluptate
       </h1>
     </div>
-    <div className="flex flex-col sm:flex-row  gap-2 mt-10 mb-90">
+    <div className="flex flex-col sm:flex-row  gap-2 mt-10 mb-40">
       <a
         href="#"
         className="px-8 py-2 w-[280px] h-[300px] bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm hover:bg-stone-700 transition-colors"
@@ -146,5 +144,127 @@ export const Hero = () => (
         Get Started Free
       </a>
     </div>
+
+    <div className="w-6xl mx-auto flex items-center justify-between gap-12 mb-20 mt-20 ">
+      <div className="flex-col  text-start ">
+        <h2 className="text-3xl text-[#EDECEC] max-w-xl  mb-2">
+          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit et
+          corporis voluptatem inventore, aperiam.
+        </h2>
+        <p className="mb-10 text-white/20">
+          Lorem, ipsum dolor sit amet consectetur adipisicing elit. <br />{" "}
+          corporis voluptatem inventore, numquam minima? Amet saepe
+          aperiam.{" "}
+        </p>
+        <Link
+          href="/login"
+          className="px-5 py-1  bg-[#F0EDE7] text-black text-sm font-medium rounded-sm hover:bg-stone-700 transition-colors font-mono tracking-wide"
+        >
+          Getstat now
+        </Link>
+      </div>
+
+      <div className="flex relative  justify-center">
+        <img
+          className="w-[450px]
+  [mask-image:radial-gradient(circle_at_center,black_5%,transparent_100%)]
+  [-webkit-mask-image:radial-gradient(circle_at_center,black_5%,transparent_100%)]
+  [mask-repeat:no-repeat]
+  [mask-size:100%_100%]"
+          src="https://cdn.prod.website-files.com/6812d02840d393aa2c663370/6847f9fe57cfb544f7d5818a_hero-home.svg"
+          alt="Hero Background"
+        />
+      </div>
+    </div>
+
+    <div className="w-6xl h-65 rounded-sm bg-[#1B1913] mb-20 flex flex-col items-center justify-center mt-50">
+      <h1 className="text-white mb-4">
+        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Rem ipsam
+      </h1>
+
+      <Link
+        href="/login"
+        className="px-5 py-1  bg-[#F0EDE7] text-black text-sm font-medium rounded-sm hover:bg-stone-700 transition-colors font-mono tracking-wide"
+      >
+        Try now
+      </Link>
+    </div>
+
+    <footer className="w-full border-t border-[#38352e] text-white">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+          {/* Brand */}
+          <div className="space-y-4">
+            <h3 className="text-lg text-start flex items-center gap-2">
+              <GiRoundShield size={25} /> Vilo
+            </h3>
+            <p className="text-sm text-neutral-500">
+              Building clean and scalable web experiences.
+            </p>
+          </div>
+
+          {/* Links 1 */}
+          <div className="space-y-3">
+            <h4 className="font-medium">Product</h4>
+            <ul className="space-y-2 text-sm text-neutral-500">
+              <li className="hover:text-black transition cursor-pointer">
+                Features
+              </li>
+              <li className="hover:text-black transition cursor-pointer">
+                Pricing
+              </li>
+              <li className="hover:text-black transition cursor-pointer">
+                Roadmap
+              </li>
+            </ul>
+          </div>
+
+          {/* Links 2 */}
+          <div className="space-y-3">
+            <h4 className="font-medium">Company</h4>
+            <ul className="space-y-2 text-sm text-neutral-500">
+              <li className="hover:text-black transition cursor-pointer">
+                About
+              </li>
+              <li className="hover:text-black transition cursor-pointer">
+                Blog
+              </li>
+              <li className="hover:text-black transition cursor-pointer">
+                Careers
+              </li>
+            </ul>
+          </div>
+
+          {/* Links 3 */}
+          <div className="space-y-3">
+            <h4 className="font-medium">Legal</h4>
+            <ul className="space-y-2 text-sm text-neutral-500">
+              <li className="hover:text-black transition cursor-pointer">
+                Privacy
+              </li>
+              <li className="hover:text-black transition cursor-pointer">
+                Terms
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Section */}
+        <div className="mt-12 pt-6  flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-neutral-500">
+          <p>© 2026 YourBrand. All rights reserved.</p>
+          <div className="flex gap-6">
+            <span className="hover:text-black cursor-pointer transition">
+              Twitter
+            </span>
+            <span className="hover:text-black cursor-pointer transition">
+              GitHub
+            </span>
+            <span className="hover:text-black cursor-pointer transition">
+              LinkedIn
+            </span>
+          </div>
+        </div>
+      </div>
+    </footer>
   </section>
 );

@@ -8,7 +8,6 @@ export default function Page() {
           <Navbar />
         </div>
       </div>
-
       <div className="w-full max-w-7xl border-x border-[#38352e] pt-20">
         <Hero />
       </div>
