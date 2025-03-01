@@ -1,34 +1,36 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { GiRoundShield } from "react-icons/gi";
 
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="relative z-50 flex items-center justify-between px-6 md:px-10 py-4 bg-[#14120B] backdrop-blur-sm ">
-      <div className="flex items-center gap-2 text-white">vilo</div>
+    <nav className="relative z-50 flex items-center justify-between px-6 md:px-10 py-4 w-7xl border-x border-[#38352e] font-gothic font">
+      <div className="flex items-center gap-2 text-white ">
+        <GiRoundShield size={25} /> Vilo
+      </div>
 
       <div className="hidden md:flex items-center gap-8">
-        {["Solutions", "Use Cases", "Developers", "Resources", "Pricing"].map(
-          (item) => (
-            <a
-              key={item}
-              href="#"
-              className="text-sm font-medium text-white hover:text-stone-900 transition-colors tracking-wide font-mono"
-            >
-              {item}
-            </a>
-          ),
-        )}
+        {["Home", "About ", "Feature", "Pricing"].map((item) => (
+          <a
+            key={item}
+            href="#"
+            className="text-sm font-medium text-white hover:text-stone-900 transition-colors tracking-wide font-mono"
+          >
+            {item}
+          </a>
+        ))}
       </div>
 
       <div className="hidden md:flex items-center gap-4">
         <Link
           href="/login"
-          className="px-5 py-2 bg-stone-900 text-white text-sm font-medium rounded-sm hover:bg-stone-700 transition-colors font-mono tracking-wide"
+          className="px-5 py-1 bg-[#F0EDE7] text-black text-sm font-medium rounded-sm hover:bg-stone-700 transition-colors font-mono tracking-wide"
         >
-          Get Started
+          Login
         </Link>
       </div>
 
@@ -72,11 +74,11 @@ export const Navbar = () => {
 };
 
 export const Hero = () => (
-  <section className="relative min-h-[calc(100vh-64px)] bg-[#14120B] flex flex-col items-center justify-center px-6 text-center overflow-hidden">
+  <section className="relative flex flex-col items-center justify-center  text-center overflow-hidden mt-30">
     <div className="relative z-10 flex flex-col items-center max-w-3xl mx-auto">
-      <div className="flex items-center gap-0 mb-8 border border-stone-300 rounded-sm overflow-hidden shadow-sm">
+      <div className="flex items-center gap-0  border border-stone-300 rounded-sm overflow-hidden shadow-sm">
         <span className="px-4 py-1.5 text-xs font-mono text-black bg-[#f0ede7] border-r border-stone-300">
-          Introducing Orren
+          Introducing vilo
         </span>
         <a
           href="#"
@@ -93,33 +95,56 @@ export const Hero = () => (
         </a>
       </div>
 
-      <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-7xl font-bold text-[#EDECEC] leading-[1.05] tracking-tight mb-6 font-mono">
-        Meet your first
-        <br />
-        autonomous builder.
+      <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[50px] font-bold text-[#EDECEC] leading-[1.05] tracking-tight mb-6 mt-4">
+        LaTeX Documents Developer Portfolios Learning Roadmaps
       </h1>
 
-      <p className="text-sm sm:text-base text-stone-500 font-mono max-w-md leading-relaxed">
-        Orren helps teams deploy AI operators that plan, execute, and scale
+      <p className="text-sm sm:text-[14px] text-[#9A9996] ">
+        Write with precision, showcase with confidence, and learn with clarity -
+        all inside <br /> one focused platform built for developers.
       </p>
 
       {/* CTA Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 mt-10">
-        <a
-          href="#"
-          className="px-8 py-3 bg-stone-900 text-white text-sm font-mono font-semibold rounded-sm hover:bg-stone-700 transition-colors"
-        >
-          Get Started Free
-        </a>
-        <a
-          href="#"
-          className="px-8 py-3 border border-stone-300 text-stone-700 text-sm font-mono font-semibold rounded-sm hover:border-stone-500 hover:text-stone-900 transition-colors"
-        >
-          View Demo
-        </a>
-      </div>
     </div>
-
-    <div className="absolute bottom-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-stone-400 to-transparent opacity-30" />
+    <div>
+      <img
+        className="w-6xl mt-30 rounded-sm"
+        src="https://i.pinimg.com/736x/21/ce/52/21ce5263171481886a153ad6ab9d9c92.jpg"
+        alt=""
+      />
+    </div>
+    <div className="mt-60 w-6xl text-white text-start">
+      <h1 className="text-2xl">
+        Lorem ipsum dolor sit amet consectetur, adipisicing
+        <br />
+        architecto beatae repellat facilis laboriosam quidem atque voluptate
+      </h1>
+    </div>
+    <div className="flex flex-col sm:flex-row  gap-2 mt-10 mb-90">
+      <a
+        href="#"
+        className="px-8 py-2 w-[280px] h-[300px] bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm hover:bg-stone-700 transition-colors"
+      >
+        Get Started Free
+      </a>
+      <a
+        href="#"
+        className="px-8 py-2 w-[280px] h-[300px] bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm hover:bg-stone-700 transition-colors"
+      >
+        Get Started Free
+      </a>
+      <a
+        href="#"
+        className="px-8 py-2 w-[280px] h-[300px] bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm hover:bg-stone-700 transition-colors"
+      >
+        Get Started Free
+      </a>
+      <a
+        href="#"
+        className="px-8 py-2 w-[280px] h-[300px] bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm hover:bg-stone-700 transition-colors"
+      >
+        Get Started Free
+      </a>
+    </div>
   </section>
 );

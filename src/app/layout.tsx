@@ -5,7 +5,8 @@ import { QueryProvider } from "@/providers/QueryProvider";
 
 const gothic = Zen_Kaku_Gothic_New({
   subsets: ["latin"],
-  weight: "300",
+  weight: "500",
+  variable: "--font-vilo-gothic",
 });
 
 export const metadata: Metadata = {
@@ -17,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${gothic.variable} `}>
+    <html lang="en" className={`${gothic.variable}`}>
       <body>
         <QueryProvider>{children}</QueryProvider>
       </body>
