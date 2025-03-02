@@ -77,7 +77,7 @@ export const Hero = () => (
   <section className="relative flex flex-col items-center justify-center  text-center overflow-hidden mt-30">
     <div className="relative z-10 flex flex-col items-center max-w-3xl mx-auto">
       <div className="flex items-center gap-0  border border-stone-300 rounded-sm overflow-hidden shadow-sm">
-        <span className="px-4 py-1.5 text-xs font-mono text-black bg-[#f0ede7] border-r border-stone-300">
+        <span className="px-4 py-1.5 text-xs  text-black bg-[#f0ede7] border-r border-stone-300">
           Introducing vilo
         </span>
         <a
@@ -177,7 +177,7 @@ export const Hero = () => (
       </div>
     </div>
 
-    <div className="w-6xl h-65 rounded-sm bg-[#1B1913] mb-20 flex flex-col items-center justify-center mt-50">
+    <div className="w-6xl h-65 rounded-sm bg-[#1B1913] border border-[#393732]/20 mb-20 flex flex-col items-center justify-center mt-50">
       <h1 className="text-white mb-4">
         Lorem, ipsum dolor sit amet consectetur adipisicing elit. Rem ipsam
       </h1>
@@ -189,82 +189,5 @@ export const Hero = () => (
         Try now
       </Link>
     </div>
-
-    <footer className="w-full border-t border-[#38352e] text-white">
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-          {/* Brand */}
-          <div className="space-y-4">
-            <h3 className="text-lg text-start flex items-center gap-2">
-              <GiRoundShield size={25} /> Vilo
-            </h3>
-            <p className="text-sm text-neutral-500">
-              Building clean and scalable web experiences.
-            </p>
-          </div>
-
-          {/* Links 1 */}
-          <div className="space-y-3">
-            <h4 className="font-medium">Product</h4>
-            <ul className="space-y-2 text-sm text-neutral-500">
-              <li className="hover:text-black transition cursor-pointer">
-                Features
-              </li>
-              <li className="hover:text-black transition cursor-pointer">
-                Pricing
-              </li>
-              <li className="hover:text-black transition cursor-pointer">
-                Roadmap
-              </li>
-            </ul>
-          </div>
-
-          {/* Links 2 */}
-          <div className="space-y-3">
-            <h4 className="font-medium">Company</h4>
-            <ul className="space-y-2 text-sm text-neutral-500">
-              <li className="hover:text-black transition cursor-pointer">
-                About
-              </li>
-              <li className="hover:text-black transition cursor-pointer">
-                Blog
-              </li>
-              <li className="hover:text-black transition cursor-pointer">
-                Careers
-              </li>
-            </ul>
-          </div>
-
-          {/* Links 3 */}
-          <div className="space-y-3">
-            <h4 className="font-medium">Legal</h4>
-            <ul className="space-y-2 text-sm text-neutral-500">
-              <li className="hover:text-black transition cursor-pointer">
-                Privacy
-              </li>
-              <li className="hover:text-black transition cursor-pointer">
-                Terms
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Bottom Section */}
-        <div className="mt-12 pt-6  flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-neutral-500">
-          <p>© 2026 YourBrand. All rights reserved.</p>
-          <div className="flex gap-6">
-            <span className="hover:text-black cursor-pointer transition">
-              Twitter
-            </span>
-            <span className="hover:text-black cursor-pointer transition">
-              GitHub
-            </span>
-            <span className="hover:text-black cursor-pointer transition">
-              LinkedIn
-            </span>
-          </div>
-        </div>
-      </div>
-    </footer>
   </section>
 );
