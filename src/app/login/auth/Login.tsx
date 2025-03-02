@@ -38,19 +38,38 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#14120B] font-gothic px-4">
-      <div className="w-full max-w-md rounded-sm overflow-hidden shadow-2xl border border-white/5">
-        <div className="bg-[#1B1913] flex flex-col justify-center p-8 text-white">
-          <h1 className="text-2xl sm:text-2xl  tracking-tight mb-2 text-white flex items-center gap-3">
-            <GiRoundShield size={30} />
+    <div className="min-h-screen flex items-stretch bg-[#14120B] font-gothic">
+      {/* Left — Image */}
+      <div className="hidden lg:block w-1/2 relative overflow-hidden h-screen">
+        <img
+          src="https://i.pinimg.com/736x/f6/60/fd/f660fdc0be1bc9faa08799fe28424dae.jpg"
+          alt="Login visual"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/30" />
+      </div>
+
+      {/* Right — Form */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-between px-8 py-12 h-screen">
+        {/* Spacer top */}
+        <div />
+
+        {/* Center content */}
+        <div className="w-full max-w-md text-white">
+          {/* Title */}
+          <h1 className="text-2xl sm:text-3xl tracking-tight mb-2 text-white flex items-center gap-2">
+            <GiRoundShield size={28} />
             Welcome back
           </h1>
 
-          <p className="text-[12px] text-white/40 mb-7 max-w-xs leading-relaxed">
+          {/* Subtitle */}
+          <p className="text-[11px] text-white/40 mb-7 max-w-xs leading-relaxed">
             Login to access your tasks, notes, and projects.
           </p>
 
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-white/70">
                 Your email
@@ -61,10 +80,11 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full border border-white/10 bg-white/5 rounded-sm px-4 py-2 text-sm text-white placeholder-white/20 outline-none focus:border-orange-500/60 focus:ring-2 focus:ring-orange-500/10 transition-all"
+                className="w-full border border-white/10 bg-white/5 rounded-sm px-4 py-2 text-sm text-white placeholder-white/20 outline-none focus:border-white/30 transition-all"
               />
             </div>
 
+            {/* Password */}
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-white/70">
@@ -84,7 +104,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full border border-white/10 bg-white/5 rounded-sm px-4 py-2 pr-16 text-sm text-white placeholder-white/20 outline-none focus:border-orange-500/60 focus:ring-2 focus:ring-orange-500/10 transition-all"
+                  className="w-full border border-white/10 bg-white/5 rounded-sm px-4 py-2 pr-16 text-sm text-white placeholder-white/20 outline-none focus:border-white/30 transition-all"
                 />
                 <button
                   type="button"
@@ -97,6 +117,7 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* Errors */}
             {validationError && (
               <p className="text-xs text-red-400">{validationError}</p>
             )}
@@ -106,6 +127,7 @@ export default function LoginPage() {
               </p>
             )}
 
+            {/* Submit */}
             <button
               type="submit"
               disabled={loginMutation.isPending}
@@ -125,36 +147,50 @@ export default function LoginPage() {
           </div>
 
           {/* Social buttons */}
-          <div className="flex gap-3 justify-between">
+          <div className="flex gap-3">
             <button
               type="button"
               aria-label="Continue with Google"
-              className="w-[50%] py-2 border border-white/10 bg-white/5 rounded-sm text-sm  text-white/50 hover:border-white/25 hover:text-white/80 hover:bg-white/10 transition-all"
+              className="w-1/2 py-2 border border-white/10 bg-white/5 rounded-sm text-sm text-white/50 hover:border-white/25 hover:text-white/80 hover:bg-white/10 transition-all"
             >
-              <h1 className="flex items-center justify-center gap-2">
+              <span className="flex items-center justify-center gap-2">
                 <FcGoogle /> Google
-              </h1>
+              </span>
             </button>
             <button
               type="button"
               aria-label="Continue with GitHub"
-              className="w-[50%] py-2 border border-white/10 bg-white/5 rounded-sm text-sm  text-white/50 hover:border-white/25 hover:text-white/80 hover:bg-white/10 transition-all"
+              className="w-1/2 py-2 border border-white/10 bg-white/5 rounded-sm text-sm text-white/50 hover:border-white/25 hover:text-white/80 hover:bg-white/10 transition-all"
             >
-              <h1 className="flex items-center justify-center gap-2">
+              <span className="flex items-center justify-center gap-2">
                 <BiLogoGithub /> Github
-              </h1>
+              </span>
             </button>
           </div>
 
+          {/* Footer */}
           <p className="text-center text-sm text-white/30 mt-6">
             Don&#39;t have an account?{" "}
             <Link
               href="/register"
-              className="text-white/90 font-medium  hover:underline transition-colors"
+              className="text-white/90 font-medium hover:underline transition-colors"
             >
               Register
             </Link>
           </p>
+        </div>
+
+        {/* Terms & Conditions — Bottom */}
+        <div className="w-full max-w-md">
+          <div className="border-t border-white/5 pt-4">
+            <h2 className="text-[12px] text-white/30 mb-1">
+              Terms & Conditions
+            </h2>
+            <p className="text-[11px] text-neutral-600 leading-relaxed">
+              By accessing this website, you agree to follow all applicable laws
+              and our terms of service.
+            </p>
+          </div>
         </div>
       </div>
     </div>
