@@ -20,7 +20,7 @@ export default function LoginPage() {
   const loginMutation = useMutation({
     mutationFn: authService.login,
     onSuccess: () => {
-      router.push("/dashboard");
+      router.push("/dashboard/portfolio");
     },
   });
 
