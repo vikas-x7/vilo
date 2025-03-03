@@ -75,7 +75,7 @@ export default function DashboardLayout({
         </div>
 
         {/* Nav */}
-        <nav className="flex flex-col text-sm mt-2 px-2 gap-0.5">
+        <nav className="flex flex-col text-sm mt-2 px-1 gap-0.5">
           {navItems.map(({ href, label, icon: Icon }) => {
             const isActive = pathname === href || pathname.startsWith(href);
             return (

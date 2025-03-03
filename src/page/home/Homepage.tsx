@@ -170,7 +170,7 @@ export const Hero = () => (
   [mask-image:radial-gradient(circle_at_center,black_5%,transparent_100%)]
   [-webkit-mask-image:radial-gradient(circle_at_center,black_5%,transparent_100%)]
   [mask-repeat:no-repeat]
-  [mask-size:100%_100%]"
+  [mask-size:100%_100%] opacity-30"
           src="https://cdn.prod.website-files.com/6812d02840d393aa2c663370/6847f9fe57cfb544f7d5818a_hero-home.svg"
           alt="Hero Background"
         />

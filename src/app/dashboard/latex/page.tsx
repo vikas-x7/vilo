@@ -1,7 +1,16 @@
-import Link from "next/link";
-import React from "react";
+"use client";
 
-const templates = [
+import Link from "next/link";
+import React, { useState } from "react";
+import {
+  FiSearch,
+  FiPlus,
+  FiArrowRight,
+  FiFileText,
+  FiTrash2,
+} from "react-icons/fi";
+
+const presetTemplates = [
   {
     id: "resume-standard",
     name: "Professional Resume",
@@ -52,88 +61,186 @@ const templates = [
   },
 ];
 
+// Mock user documents — replace with real data from API
+const initialUserDocs = [
+  { id: "user-1", name: "My Thesis Draft", updatedAt: "2 hours ago" },
+  { id: "user-2", name: "CV — April 2025", updatedAt: "Yesterday" },
+  { id: "user-3", name: "Conference Paper", updatedAt: "3 days ago" },
+];
+
 export default function LatexPage() {
+  const [search, setSearch] = useState("");
+  const [userDocs, setUserDocs] = useState(initialUserDocs);
+
+  const filteredPresets = presetTemplates.filter(
+    (t) =>
+      t.name.toLowerCase().includes(search.toLowerCase()) ||
+      t.description.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  const filteredUserDocs = userDocs.filter((d) =>
+    d.name.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  const deleteDoc = (id: string) => {
+    setUserDocs((prev) => prev.filter((d) => d.id !== id));
+  };
+
   return (
-    <div className="p-8 max-w-7xl mx-auto flex flex-col min-h-full">
+    <div className="px-8 py-6 max-w-7xl mx-auto flex flex-col min-h-full">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-5 border-b border-white/5 mb-6">
         <div>
-          <h1 className="text-2xl tracking-tight text-white/90">
+          <h1 className="text-xl tracking-tight text-white/90">
             LaTeX Templates
           </h1>
-          <p className="text-[11px] text-white/30 mt-1.5">
+          <p className="text-[11px] text-white/30 mt-1">
             Start a new document from a template or create your own from
             scratch.
           </p>
         </div>
-        <Link
-          href="/dashboard/latex/editor"
-          className="bg-[#F0EDE7] hover:bg-[#F0EDE7]/90 text-black/80 text-sm font-semibold py-2 px-5 rounded-sm transition-all duration-200 flex items-center gap-2 whitespace-nowrap"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Create New Document
-        </Link>
+        {/* Search */}
+        <div className="relative w-full md:w-64">
+          <FiSearch
+            size={13}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25"
+          />
+          <input
+            type="text"
+            placeholder="Search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-white/5 border border-white/10 rounded-sm pl-8 pr-4 py-2 text-xs text-white/70 placeholder-white/20 outline-none focus:border-white/20 transition-all"
+          />
+        </div>
       </div>
 
-      {/* Divider */}
-      <div className="h-px bg-white/5 mb-8" />
+      {/* ── User Documents ── */}
+      <section className="mb-8">
+        <p className="text-[10px] text-white/20 uppercase tracking-widest mb-3">
+          My Documents
+        </p>
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pb-10">
-        {templates.map((template) => (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+          {/* Create New */}
           <Link
-            href={`/dashboard/latex/editor?template=${template.id}`}
-            key={template.id}
-            className="group flex flex-col bg-[#1B1913] border border-white/5 rounded-sm overflow-hidden hover:border-white/15 transition-all duration-300"
+            href="/dashboard/latex/editor"
+            className="group flex flex-col items-center justify-center bg-white/[0.02] border border-dashed border-white/10 rounded-sm hover:border-white/20 hover:bg-white/5 transition-all duration-300 aspect-[3/4]"
           >
-            {/* Image */}
-            <div className="relative h-44 w-full overflow-hidden">
-              <div className="absolute inset-0 bg-black/40 z-10" />
-              <img
-                src={template.image}
-                alt={template.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-60"
-              />
+            <div className="w-8 h-8 border border-white/10 rounded-sm flex items-center justify-center text-white/30 group-hover:text-white/60 group-hover:border-white/20 transition-all mb-2">
+              <FiPlus size={16} />
             </div>
+            <span className="text-[11px] text-white/30 group-hover:text-white/60 transition-colors">
+              New Document
+            </span>
+          </Link>
 
-            {/* Content */}
-            <div className="p-5 flex flex-col flex-1">
-              <h3 className="text-sm font-medium text-white/80 group-hover:text-white transition-colors mb-1.5">
-                {template.name}
-              </h3>
-              <p className="text-[11px] text-white/30 flex-1 leading-relaxed">
-                {template.description}
-              </p>
-              <div className="mt-5 flex items-center text-xs text-white/40 group-hover:text-white/70 transition-all duration-300 transform translate-x-[-6px] group-hover:translate-x-0">
-                Use Template
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-3.5 w-3.5 ml-1.5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
+          {/* User doc cards */}
+          {filteredUserDocs.map((doc) => (
+            <div
+              key={doc.id}
+              className="group relative flex flex-col bg-[#1B1913] border border-white/5 rounded-sm overflow-hidden hover:border-white/15 transition-all duration-300 aspect-[3/4]"
+            >
+              {/* Mock paper preview */}
+              <div className="flex-1 flex flex-col items-center justify-center bg-[#0F0E09] p-4 gap-1.5">
+                <FiFileText size={28} className="text-white/15" />
+                <div className="w-full space-y-1.5 mt-2">
+                  {[80, 60, 70, 50, 65].map((w, i) => (
+                    <div
+                      key={i}
+                      className="h-px bg-white/8 rounded-full"
+                      style={{ width: `${w}%` }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Info */}
+              <div className="px-3 py-2.5 border-t border-white/5">
+                <p className="text-xs text-white/70 font-medium truncate">
+                  {doc.name}
+                </p>
+                <p className="text-[10px] text-white/25 mt-0.5">
+                  {doc.updatedAt}
+                </p>
+              </div>
+
+              {/* Hover actions */}
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center gap-2">
+                <Link
+                  href={`/dashboard/latex/editor?doc=${doc.id}`}
+                  className="px-3 py-1.5 bg-[#F0EDE7] text-black/80 text-[10px] font-semibold rounded-sm hover:bg-[#F0EDE7]/90 transition-all"
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                  Open
+                </Link>
+                <button
+                  onClick={() => deleteDoc(doc.id)}
+                  className="p-1.5 bg-white/10 border border-white/10 rounded-sm text-white/50 hover:text-red-400 hover:border-red-400/30 transition-all"
+                >
+                  <FiTrash2 size={12} />
+                </button>
               </div>
             </div>
-          </Link>
-        ))}
-      </div>
+          ))}
+
+          {/* Empty state for user docs */}
+          {filteredUserDocs.length === 0 && search && (
+            <div className="col-span-full py-6 text-center text-white/20 text-xs">
+              No documents match &quot;{search}&quot;
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Divider */}
+      <div className="h-px bg-white/5 mb-6" />
+
+      {/* ── Preset Templates ── */}
+      <section className="mb-10">
+        <p className="text-[10px] text-white/20 uppercase tracking-widest mb-3">
+          Templates
+        </p>
+
+        {filteredPresets.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+            {filteredPresets.map((template, i) => (
+              <Link
+                href={`/dashboard/latex/editor?template=${template.id}`}
+                key={`${template.id}-${i}`}
+                className="group flex flex-col bg-[#1B1913] border border-white/5 rounded-sm overflow-hidden hover:border-white/15 transition-all duration-300"
+              >
+                <div className="relative w-full aspect-video overflow-hidden">
+                  <div className="absolute inset-0 bg-black/40 z-10" />
+                  <img
+                    src={template.image}
+                    alt={template.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-60"
+                  />
+                </div>
+                <div className="p-3 flex flex-col flex-1">
+                  <h3 className="text-xs font-medium text-white/80 group-hover:text-white transition-colors mb-1">
+                    {template.name}
+                  </h3>
+                  <p className="text-[10px] text-white/25 flex-1 leading-relaxed line-clamp-2">
+                    {template.description}
+                  </p>
+                  <div className="mt-3 flex items-center text-[10px] text-white/30 group-hover:text-white/60 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0">
+                    Use Template
+                    <FiArrowRight size={11} className="ml-1" />
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-16 text-white/20">
+            <FiSearch size={24} className="mb-3 opacity-40" />
+            <p className="text-xs">
+              No templates found for &quot;{search}&quot;
+            </p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
