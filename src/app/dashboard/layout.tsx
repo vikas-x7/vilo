@@ -15,13 +15,14 @@ import {
   FiSettings,
   FiLogOut,
 } from "react-icons/fi";
+import { CiGlobe } from "react-icons/ci";
 import { usePathname } from "next/navigation";
 
 const navItems = [
   {
     href: "/dashboard/portfolio",
     label: "Portfolio",
-    icon: TbBrandGoogleAnalytics,
+    icon: CiGlobe,
   },
   { href: "/dashboard/latex", label: "LaTeX", icon: FiFileText },
   { href: "/dashboard/roadmap", label: "Roadmap", icon: FiMap },
