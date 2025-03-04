@@ -4,40 +4,117 @@ import React, { useState } from "react";
 import { FiBookmark, FiSearch } from "react-icons/fi";
 
 const roadmaps = [
-  "Frontend",
-  "Backend",
-  "Full Stack",
-  "DevOps",
-  "DevSecOps",
-  "Data Analyst",
-  "AI Engineer",
-  "AI and Data Scientist",
-  "Data Engineer",
-  "Android",
-  "Machine Learning",
-  "PostgreSQL",
-  "iOS",
-  "Blockchain",
-  "QA",
-  "Software Architect",
-  "Cyber Security",
-  "UX Design",
-  "Technical Writer",
-  "Game Developer",
-  "Server Side Game Developer",
-  "MLOps",
-  "Product Manager",
-  "Engineering Manager",
-  "Developer Relations",
-  "BI Analyst",
+  {
+    name: "Frontend",
+    desc: "HTML, CSS, JavaScript, React and modern UI frameworks.",
+  },
+  {
+    name: "Backend",
+    desc: "Servers, databases, APIs and backend architecture.",
+  },
+  {
+    name: "Full Stack",
+    desc: "End-to-end development from UI to server and database.",
+  },
+  {
+    name: "DevOps",
+    desc: "CI/CD pipelines, Docker, Kubernetes and cloud infrastructure.",
+  },
+  {
+    name: "DevSecOps",
+    desc: "Security practices integrated into the DevOps lifecycle.",
+  },
+  {
+    name: "Data Analyst",
+    desc: "Data cleaning, visualization and business intelligence.",
+  },
+  {
+    name: "AI Engineer",
+    desc: "Building and deploying AI models and intelligent systems.",
+  },
+  {
+    name: "AI and Data Scientist",
+    desc: "ML algorithms, statistical modeling and deep learning.",
+  },
+  {
+    name: "Data Engineer",
+    desc: "Data pipelines, warehousing and large-scale data systems.",
+  },
+  {
+    name: "Android",
+    desc: "Native Android development with Kotlin and Jetpack.",
+  },
+  {
+    name: "Machine Learning",
+    desc: "Supervised, unsupervised learning and neural networks.",
+  },
+  {
+    name: "PostgreSQL",
+    desc: "Relational database design, queries and optimization.",
+  },
+  { name: "iOS", desc: "Native iOS development with Swift and SwiftUI." },
+  {
+    name: "Blockchain",
+    desc: "Smart contracts, Web3 and decentralized applications.",
+  },
+  {
+    name: "QA",
+    desc: "Testing strategies, automation and quality assurance practices.",
+  },
+  {
+    name: "Software Architect",
+    desc: "System design, patterns and scalable architecture.",
+  },
+  {
+    name: "Cyber Security",
+    desc: "Threat analysis, ethical hacking and security protocols.",
+  },
+  {
+    name: "UX Design",
+    desc: "User research, wireframing, prototyping and design systems.",
+  },
+  {
+    name: "Technical Writer",
+    desc: "Docs, API references and developer communication.",
+  },
+  {
+    name: "Game Developer",
+    desc: "Game engines, physics, rendering and game design.",
+  },
+  {
+    name: "Server Side Game Developer",
+    desc: "Multiplayer backends, game servers and networking.",
+  },
+  {
+    name: "MLOps",
+    desc: "ML model deployment, monitoring and lifecycle management.",
+  },
+  {
+    name: "Product Manager",
+    desc: "Roadmaps, stakeholder management and product strategy.",
+  },
+  {
+    name: "Engineering Manager",
+    desc: "Team leadership, hiring and engineering culture.",
+  },
+  {
+    name: "Developer Relations",
+    desc: "Community building, advocacy and developer experience.",
+  },
+  {
+    name: "BI Analyst",
+    desc: "Business intelligence, dashboards and data-driven decisions.",
+  },
 ];
 
 export default function RoadmapPage() {
   const [search, setSearch] = useState("");
   const [saved, setSaved] = useState<string[]>([]);
 
-  const filtered = roadmaps.filter((r) =>
-    r.toLowerCase().includes(search.toLowerCase()),
+  const filtered = roadmaps.filter(
+    (r) =>
+      r.name.toLowerCase().includes(search.toLowerCase()) ||
+      r.desc.toLowerCase().includes(search.toLowerCase()),
   );
 
   const toggleSave = (name: string) => {
@@ -56,8 +133,6 @@ export default function RoadmapPage() {
             Choose a path and start building your skills step by step.
           </p>
         </div>
-
-        {/* Search */}
         <div className="relative w-full md:w-64">
           <FiSearch
             size={13}
@@ -73,42 +148,44 @@ export default function RoadmapPage() {
         </div>
       </div>
 
-      {/* Saved section */}
+      {/* Saved */}
       {saved.length > 0 && !search && (
         <section className="mb-6">
           <p className="text-[10px] text-white/20 uppercase tracking-widest mb-3">
             Saved
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-6">
-            {saved.map((name) => (
-              <RoadmapCard
-                key={name}
-                name={name}
-                isSaved
-                onToggle={() => toggleSave(name)}
-              />
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mb-6">
+            {saved.map((name) => {
+              const item = roadmaps.find((r) => r.name === name)!;
+              return (
+                <RoadmapCard
+                  key={name}
+                  item={item}
+                  isSaved
+                  onToggle={() => toggleSave(name)}
+                />
+              );
+            })}
           </div>
           <div className="h-px bg-white/5 mb-6" />
         </section>
       )}
 
-      {/* All Roadmaps */}
+      {/* All */}
       <section>
         {!search && (
           <p className="text-[10px] text-white/20 uppercase tracking-widest mb-3">
             All Roadmaps
           </p>
         )}
-
         {filtered.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 pb-10">
-            {filtered.map((name) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pb-10">
+            {filtered.map((item) => (
               <RoadmapCard
-                key={name}
-                name={name}
-                isSaved={saved.includes(name)}
-                onToggle={() => toggleSave(name)}
+                key={item.name}
+                item={item}
+                isSaved={saved.includes(item.name)}
+                onToggle={() => toggleSave(item.name)}
               />
             ))}
           </div>
@@ -126,28 +203,33 @@ export default function RoadmapPage() {
 }
 
 function RoadmapCard({
-  name,
+  item,
   isSaved,
   onToggle,
 }: {
-  name: string;
+  item: { name: string; desc: string };
   isSaved: boolean;
   onToggle: () => void;
 }) {
   return (
-    <div className="group relative flex items-center justify-between bg-[#1B1913] border border-white/5 hover:border-white/15 rounded-sm px-4 py-3.5 transition-all duration-200 cursor-pointer">
-      <span className="text-sm text-white/60 group-hover:text-white/90 transition-colors">
-        {name}
-      </span>
+    <div className="group relative flex items-start justify-between bg-[#1B1913] border border-white/5 hover:border-white/15 rounded-sm px-4 py-3.5 transition-all duration-200 cursor-pointer">
+      <div className="flex-1 min-w-0 pr-3">
+        <p className="text-sm text-white/70 group-hover:text-white/90 transition-colors leading-tight">
+          {item.name}
+        </p>
+        <p className="text-[11px] text-white/25 mt-1 leading-relaxed line-clamp-2">
+          {item.desc}
+        </p>
+      </div>
       <button
         onClick={(e) => {
           e.stopPropagation();
           onToggle();
         }}
-        className="text-white/20 hover:text-white/70 transition-colors ml-3 shrink-0"
+        className="text-white/20 hover:text-white/70 transition-colors shrink-0 mt-0.5"
       >
         <FiBookmark
-          size={14}
+          size={13}
           className={isSaved ? "fill-white/60 text-white/60" : ""}
         />
       </button>

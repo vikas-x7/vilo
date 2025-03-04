@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState, useRef } from "react";
@@ -9,9 +10,11 @@ import {
   FiTrash2,
   FiZap,
   FiEdit2,
+  FiLock,
+  FiEye,
+  FiLink,
 } from "react-icons/fi";
 
-// ── Types ──────────────────────────────────────────────
 type Experience = {
   id: number;
   role: string;
@@ -67,7 +70,7 @@ const defaultData = {
   linkedin: "linkedin.com/in/vikaspal",
 };
 
-// ── Editable Text ──────────────────────────────────────
+// ── Editable ───────────────────────────────────────────
 function Editable({
   value,
   onChange,
@@ -85,7 +88,6 @@ function Editable({
 }) {
   const [editing, setEditing] = useState(false);
   const ref = useRef<any>(null);
-
   if (editing) {
     return multiline ? (
       <textarea
@@ -108,7 +110,6 @@ function Editable({
       />
     );
   }
-
   return (
     <Tag
       onClick={() => setEditing(true)}
@@ -123,7 +124,6 @@ function Editable({
   );
 }
 
-// ── Section Label ──────────────────────────────────────
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <p className="text-[9px] text-white/20 uppercase tracking-widest mb-3">
@@ -132,7 +132,6 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ── Tag (skill) ────────────────────────────────────────
 function SkillTag({
   value,
   onChange,
@@ -169,7 +168,10 @@ function SkillTag({
 export default function PortfolioPage() {
   const [data, setData] = useState(defaultData);
   const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [deployed, setDeployed] = useState(false);
+  const [isPublic, setIsPublic] = useState(true);
+  const [showVisibilityMenu, setShowVisibilityMenu] = useState(false);
   const avatarRef = useRef<HTMLInputElement>(null);
   const deployedUrl = `https://vilo.app/${data.username}`;
 
@@ -201,6 +203,12 @@ export default function PortfolioPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleLinkCopy = () => {
+    navigator.clipboard.writeText(deployedUrl);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
+
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) set("avatar", URL.createObjectURL(file));
@@ -209,15 +217,88 @@ export default function PortfolioPage() {
   return (
     <div className="flex flex-col h-screen bg-[#14120B] font-gothic text-white overflow-hidden">
       {/* ── Topbar ── */}
-      <div className="px-6 py-3.5 border-b border-white/5 bg-[#1B1913] flex items-center justify-between shrink-0">
+      <div className="px-6 py-3 border-b border-white/5 bg-[#1B1913] flex items-center justify-between shrink-0">
+        {/* Left — URL + quick copy */}
         <div className="flex items-center gap-2">
-          <FiGlobe size={13} className="text-white/30" />
-          <span className="text-[11px] text-white/30">{deployedUrl}</span>
+          <FiGlobe size={13} className="text-white/25 shrink-0" />
+          <span className="text-[11px] text-white/35">{deployedUrl}</span>
+          <button
+            onClick={handleLinkCopy}
+            title="Copy link"
+            className="p-1 rounded-sm text-white/20 hover:text-white/60 hover:bg-white/5 transition-all"
+          >
+            {linkCopied ? (
+              <FiCheck size={11} className="text-green-400" />
+            ) : (
+              <FiLink size={11} />
+            )}
+          </button>
         </div>
+
+        {/* Right — actions */}
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-white/20 mr-1">
+          <span className="text-[10px] text-white/20 mr-1 hidden sm:block">
             Click any text to edit
           </span>
+
+          {/* Visibility toggle */}
+          <div className="relative">
+            <button
+              onClick={() => setShowVisibilityMenu((p) => !p)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] border rounded-sm transition-all ${
+                isPublic
+                  ? "text-green-400/80 border-green-500/20 bg-green-950/20 hover:border-green-500/40"
+                  : "text-white/40 border-white/10 bg-white/5 hover:border-white/20"
+              }`}
+            >
+              {isPublic ? <FiEye size={11} /> : <FiLock size={11} />}
+              {isPublic ? "Public" : "Private"}
+            </button>
+
+            {showVisibilityMenu && (
+              <div className="absolute right-0 top-9 z-50 bg-[#1B1913] border border-white/10 rounded-sm shadow-2xl w-44 overflow-hidden">
+                <button
+                  onClick={() => {
+                    setIsPublic(true);
+                    setShowVisibilityMenu(false);
+                  }}
+                  className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-[11px] hover:bg-white/5 transition-all ${isPublic ? "text-green-400" : "text-white/50"}`}
+                >
+                  <FiEye size={12} />
+                  <div className="text-left">
+                    <p className="font-medium">Public</p>
+                    <p className="text-[10px] text-white/25">
+                      Anyone with the link
+                    </p>
+                  </div>
+                  {isPublic && (
+                    <FiCheck size={10} className="ml-auto text-green-400" />
+                  )}
+                </button>
+                <div className="h-px bg-white/5" />
+                <button
+                  onClick={() => {
+                    setIsPublic(false);
+                    setShowVisibilityMenu(false);
+                  }}
+                  className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-[11px] hover:bg-white/5 transition-all ${!isPublic ? "text-white/80" : "text-white/50"}`}
+                >
+                  <FiLock size={12} />
+                  <div className="text-left">
+                    <p className="font-medium">Private</p>
+                    <p className="text-[10px] text-white/25">
+                      Only you can see
+                    </p>
+                  </div>
+                  {!isPublic && (
+                    <FiCheck size={10} className="ml-auto text-white/60" />
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Copy link (shown after deploy) */}
           {deployed && (
             <button
               onClick={handleCopy}
@@ -231,9 +312,11 @@ export default function PortfolioPage() {
               {copied ? "Copied!" : "Copy Link"}
             </button>
           )}
+
+          {/* Deploy */}
           <button
             onClick={() => setDeployed(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-black/80 bg-[#F0EDE7] hover:bg-[#F0EDE7]/90 rounded-sm transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-black/80 bg-[#F0EDE7] hover:bg-white rounded-sm transition-all"
           >
             <FiZap size={11} />
             {deployed ? "Re-deploy" : "Deploy"}
@@ -243,16 +326,34 @@ export default function PortfolioPage() {
 
       {/* Deployed badge */}
       {deployed && (
-        <div className="px-6 py-2 bg-green-950/30 border-b border-green-500/10 flex items-center gap-2 shrink-0">
-          <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-          <p className="text-[10px] text-green-400/70">
-            Live at <span className="text-green-400">{deployedUrl}</span>
-          </p>
+        <div className="px-6 py-2 bg-green-950/30 border-b border-green-500/10 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            <p className="text-[10px] text-green-400/70">
+              Live at <span className="text-green-400">{deployedUrl}</span>
+            </p>
+            {!isPublic && (
+              <span className="flex items-center gap-1 text-[10px] text-amber-400/60 border border-amber-500/15 px-1.5 py-0.5 rounded-sm ml-1">
+                <FiLock size={8} /> Private — only you can see
+              </span>
+            )}
+          </div>
+          {/* Inline copy */}
+          <button
+            onClick={handleCopy}
+            className="flex items-center gap-1 text-[10px] text-green-400/50 hover:text-green-400 transition-colors"
+          >
+            {copied ? <FiCheck size={10} /> : <FiCopy size={10} />}
+            {copied ? "Copied!" : "Copy"}
+          </button>
         </div>
       )}
 
       {/* ── Portfolio Canvas ── */}
-      <div className="flex-1 overflow-y-auto">
+      <div
+        className="flex-1 overflow-y-auto"
+        onClick={() => showVisibilityMenu && setShowVisibilityMenu(false)}
+      >
         <div className="max-w-3xl mx-auto px-8 py-10 space-y-10">
           {/* Hero */}
           <div className="flex items-start gap-5 pb-8 border-b border-white/5">
@@ -432,12 +533,28 @@ export default function PortfolioPage() {
                     placeholder="Short description"
                     multiline
                   />
-                  <Editable
-                    value={p.link}
-                    onChange={(v) => updateItem("projects", p.id, { link: v })}
-                    className="text-[10px] text-white/20 mt-2"
-                    placeholder="https://github.com/..."
-                  />
+                  {/* Link with copy */}
+                  <div className="flex items-center gap-1.5 mt-2 group/link">
+                    <Editable
+                      value={p.link}
+                      onChange={(v) =>
+                        updateItem("projects", p.id, { link: v })
+                      }
+                      className="text-[10px] text-white/20 flex-1"
+                      placeholder="https://github.com/..."
+                    />
+                    {p.link && (
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(p.link);
+                        }}
+                        className="text-white/15 hover:text-white/50 transition-colors opacity-0 group-hover/link:opacity-100"
+                        title="Copy link"
+                      >
+                        <FiCopy size={9} />
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
               <button
