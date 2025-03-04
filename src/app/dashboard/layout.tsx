@@ -19,12 +19,13 @@ import { CiGlobe } from "react-icons/ci";
 import { usePathname } from "next/navigation";
 
 const navItems = [
+  { href: "/dashboard/latex", label: "LaTeX", icon: FiFileText },
   {
     href: "/dashboard/portfolio",
     label: "Portfolio",
     icon: CiGlobe,
   },
-  { href: "/dashboard/latex", label: "LaTeX", icon: FiFileText },
+
   { href: "/dashboard/roadmap", label: "Roadmap", icon: FiMap },
   { href: "/dashboard/profile", label: "Profile", icon: FiUser },
 ];

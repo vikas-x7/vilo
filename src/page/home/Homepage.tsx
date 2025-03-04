@@ -104,10 +104,25 @@ export const Hero = () => (
         all inside <br /> one focused platform built for developers.
       </p>
     </div>
-    <div>
+    <div className="relative w-fit mt-20">
+      {/* Background image */}
       <img
-        className="w-6xl mt-30 rounded-sm"
+        className="w-6xl rounded-sm"
         src="https://i.pinimg.com/736x/21/ce/52/21ce5263171481886a153ad6ab9d9c92.jpg"
+        alt=""
+      />
+
+      {/* Overlay image */}
+      <img
+        className="absolute top-6 left-9 right-9 bottom-0 w-auto mt-9"
+        style={{
+          left: "2.25rem",
+          right: "2.25rem",
+          top: "1.5rem",
+          width: "calc(100% - 4.5rem)",
+          borderRadius: "8px",
+        }}
+        src="https://res.cloudinary.com/dyv9kenuj/image/upload/v1771953075/Screenshot_from_2026-02-24_22-40-59_esdabd.png"
         alt=""
       />
     </div>
@@ -121,25 +136,25 @@ export const Hero = () => (
     <div className="flex flex-col sm:flex-row  gap-2 mt-10 mb-40">
       <a
         href="#"
-        className="px-8 py-2 w-[280px] h-[300px] bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm hover:bg-stone-700 transition-colors"
+        className="px-8 py-2 w-70 h-75 bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm hover:bg-stone-700 transition-colors"
       >
         Get Started Free
       </a>
       <a
         href="#"
-        className="px-8 py-2 w-[280px] h-[300px] bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm hover:bg-stone-700 transition-colors"
+        className="px-8 py-2 w-70 h-75 bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm hover:bg-stone-700 transition-colors"
       >
         Get Started Free
       </a>
       <a
         href="#"
-        className="px-8 py-2 w-[280px] h-[300px] bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm hover:bg-stone-700 transition-colors"
+        className="px-8 py-2 w-70 h-75 bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm hover:bg-stone-700 transition-colors"
       >
         Get Started Free
       </a>
       <a
         href="#"
-        className="px-8 py-2 w-[280px] h-[300px] bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm hover:bg-stone-700 transition-colors"
+        className="px-8 py-2 w-70 h-75 bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm hover:bg-stone-700 transition-colors"
       >
         Get Started Free
       </a>
