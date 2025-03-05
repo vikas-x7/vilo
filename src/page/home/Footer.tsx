@@ -12,7 +12,8 @@ function Footer() {
               <GiRoundShield size={25} /> Vilo
             </h3>
             <p className="text-sm text-neutral-500">
-              Building clean and scalable web experiences.
+              Write with precision, showcase with confidence, and learn with
+              clarity all in one focused platform.
             </p>
           </div>
 
@@ -39,12 +40,6 @@ function Footer() {
               <li className="hover:text-black transition cursor-pointer">
                 About
               </li>
-              <li className="hover:text-black transition cursor-pointer">
-                Blog
-              </li>
-              <li className="hover:text-black transition cursor-pointer">
-                Careers
-              </li>
             </ul>
           </div>
 
@@ -64,7 +59,7 @@ function Footer() {
 
         {/* Bottom Section */}
         <div className="mt-12 pt-6  flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-neutral-500">
-          <p>© 2026 YourBrand. All rights reserved.</p>
+          <p>© 2026 vilo. All rights reserved.</p>
           <div className="flex gap-6">
             <span className="hover:text-black cursor-pointer transition">
               Twitter

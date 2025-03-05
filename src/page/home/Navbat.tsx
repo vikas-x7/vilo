@@ -9,7 +9,7 @@ export const Navbar = () => {
 
   return (
     <nav className="relative z-50 flex items-center justify-between px-6 md:px-10 py-4 w-7xl border-x border-[#38352e] font-gothic font">
-      <div className="flex items-center gap-2 text-white ">
+      <div className="flex items-center gap-2 text-[#E6ECEC] ">
         <GiRoundShield size={25} /> Vilo
       </div>
 
@@ -18,7 +18,7 @@ export const Navbar = () => {
           <a
             key={item}
             href="#"
-            className="text-sm font-medium text-white hover:text-stone-900 transition-colors tracking-wide font-mono"
+            className="text-sm text-[#E6ECEC] hover:text-[#E6ECEC]/60 transition-colors tracking-wide font-mono"
           >
             {item}
           </a>
@@ -58,7 +58,7 @@ export const Navbar = () => {
             ),
           )}
           <hr className="border-stone-200" />
-          <a href="#" className="text-sm font-mono text-stone-600">
+          <a href="#" className="text-sm  text-stone-600">
             Login
           </a>
           <a

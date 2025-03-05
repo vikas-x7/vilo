@@ -1,6 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import Link from "next/link";
+import { CiGlobe } from "react-icons/ci";
+import { IoIosArrowRoundForward, IoMdDocument } from "react-icons/io";
+import { SiFuturelearn } from "react-icons/si";
 
 export const Hero = () => (
   <section className="relative flex flex-col items-center justify-center  text-center overflow-hidden mt-30">
@@ -11,20 +14,13 @@ export const Hero = () => (
         </span>
         <a
           href="#"
-          className="px-4 py-1.5 text-xs font-mono font-semibold text-white bg-stone-900 hover:bg-stone-700 transition-colors flex items-center gap-1.5"
+          className="px-4 py-1.5 text-xs font-mono font-semibold text-white  hover:bg-stone-700 transition-colors flex gap-1.5 items-center justify-center"
         >
-          Try now
-          <svg
-            viewBox="0 0 24 24"
-            className="w-3 h-3 fill-none stroke-current"
-            strokeWidth="2.5"
-          >
-            <path d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
+          Try now <IoIosArrowRoundForward />
         </a>
       </div>
 
-      <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[50px] font-bold text-[#EDECEC] leading-[1.05] tracking-tight mb-6 mt-4">
+      <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[50px] font-bold text-[#E6ECEC] leading-[1.05] tracking-tight mb-6 mt-4">
         LaTeX Documents Developer Portfolios Learning Roadmaps
       </h1>
 
@@ -54,46 +50,116 @@ export const Hero = () => (
       />
     </div>
     <div className="mt-60 w-6xl text-start">
-      <h1 className="text-[20px] text-[#EDECEC]/70 ">
+      <h1 className="text-[23px] text-[#E6ECEC]/90  mb-10">
         All the Essential Tools to Create Professional Documents, Showcase{" "}
         <br />
         Projects and Follow Structured Learning Paths
       </h1>
     </div>
     <div className="flex flex-col sm:flex-row  gap-2 mt-10 mb-40">
-      <p className="px-8 py-2 w-70 h-75 bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm transition-colors border border-[#393732]/20 text-start ">
-        <h1>Latex</h1>
-      </p>
+      <div className="w-72 h-80 rounded-sm overflow-hidden relative">
+        <img
+          src="https://i.pinimg.com/736x/ca/eb/4d/caeb4de0657fb92409b28549d36cabdc.jpg"
+          alt="visual"
+          className="w-full h-full object-cover opacity-50"
+        />
+
+        <h1 className="absolute bottom-6 left-6 text-white text-[16px]">
+          Our Services
+        </h1>
+      </div>
       <a
         href="#"
-        className="px-8 py-2 w-70 h-75 bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm  transition-colors border border-[#393732]/20"
+        className="w-72 bg-[#1B1913] text-[#EDECEC] text-sm text-start rounded-sm border border-[#393732]/20 p-6 flex flex-col justify-between  transition-all"
       >
-        Get Started Free
+        <div className="flex items-start justify-between">
+          <div className="w-8 h-8 rounded-sm flex items-center=justify-center">
+            <IoMdDocument size={34} />
+          </div>
+          <span className="text-xs text-[#E6ECEC]/30">/01</span>
+        </div>
+
+        <h3 className="mt-6 text-base text-[#E6ECEC]/90 ">LaTex Documents</h3>
+
+        <ul className="mt-6 space-y-2 text-xs text-[#E6ECEC]/30">
+          <li>✓ Structured LaTeX editing</li>
+          <li>✓ Live preview</li>
+          <li>✓ Professional templates</li>
+          <li>✓ Clean PDF export</li>
+          <li>✓ Smart formatting support</li>
+        </ul>
+
+        {/* Bottom Link */}
+        <div className="mt-6 text-xs flex items-center gap-1">
+          Learn more <span>↗</span>
+        </div>
       </a>
       <a
         href="#"
-        className="px-8 py-2 w-70 h-75 bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm  transition-colors border border-[#393732]/20"
+        className="w-72 bg-[#1B1913] text-[#EDECEC] text-sm text-start rounded-sm border border-[#393732]/20 p-6 flex flex-col justify-between  transition-all"
       >
-        Get Started Free
+        <div className="flex items-start justify-between">
+          <div className="w-8 h-8 rounded-sm flex items-center justify-center">
+            <SiFuturelearn size={25} />
+          </div>
+          <span className="text-xs text-[#E6ECEC]/30">/02</span>
+        </div>
+
+        <h3 className="mt-6 text-base text-[#E6ECEC]/90">Learning Roadmaps</h3>
+
+        <ul className="mt-6 space-y-2 text-xs text-[#E6ECEC]/30">
+          <li>✓ Follow structured roadmaps</li>
+          <li>✓ Track your progress</li>
+          <li>✓ Bookmark key topics</li>
+          <li>✓ Organized learning paths</li>
+          <li>✓ Step-by-step guidance</li>
+        </ul>
+
+        {/* Bottom Link */}
+        <div className="mt-6 text-xs flex items-center gap-1">
+          Learn more <span>↗</span>
+        </div>
       </a>
       <a
         href="#"
-        className="px-8 py-2 w-70 h-75 bg-[#1B1913] text-[#EDECEC] text-sm rounded-sm transition-colors border border-[#393732]/20"
+        className="w-72 bg-[#1B1913] text-[#EDECEC] text-sm text-start rounded-sm border border-[#393732]/20 p-6 flex flex-col justify-between  transition-all"
       >
-        Get Started Free
+        <div className="flex items-start justify-between">
+          <div className="w-8 h-8  rounded-sm flex items-center justify-center">
+            <CiGlobe size={25} />
+          </div>
+          <span className="text-xs text-[#E6ECEC]/30">/03</span>
+        </div>
+
+        <h3 className="mt-6 text-base text-[#E6ECEC]/90 ">
+          Deployed Portfolio
+        </h3>
+
+        <ul className="mt-6 space-y-2 text-xs text-[#E6ECEC]/30">
+          <li>✓ Build structured portfolios</li>
+          <li>✓ Showcase real projects</li>
+          <li>✓ Highlight skills clearly</li>
+          <li>✓ Clean, modern layouts</li>
+          <li>✓ Deploy in one click</li>
+        </ul>
+
+        {/* Bottom Link */}
+        <div className="mt-6 text-xs flex items-center gap-1">
+          Learn more <span>↗</span>
+        </div>
       </a>
     </div>
 
     <div className="w-6xl mx-auto flex items-center justify-between gap-12 mb-20 mt-20 ">
       <div className="flex-col  text-start ">
         <h2 className="text-3xl text-[#EDECEC] max-w-xl  mb-2">
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit et
-          corporis voluptatem inventore, aperiam.
+          We bring everything you need to build and grow into one place.
         </h2>
-        <p className="mb-10 text-white/20">
-          Lorem, ipsum dolor sit amet consectetur adipisicing elit. <br />{" "}
-          corporis voluptatem inventore, numquam minima? Amet saepe
-          aperiam.{" "}
+        <p className="mb-10 text-[#E6ECEC]/30 mt-3">
+          Create professional resumes, showcase your projects clearly, and grow{" "}
+          <br />
+          with structured learning paths all inside one focused and easy-to-use
+          platform.
         </p>
         <Link
           href="/login"
@@ -117,8 +183,8 @@ export const Hero = () => (
     </div>
 
     <div className="w-6xl h-65 rounded-sm bg-[#1B1913] border border-[#393732]/20 mb-20 flex flex-col items-center justify-center mt-50">
-      <h1 className="text-white mb-4">
-        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Rem ipsam
+      <h1 className="text-[#E6ECEC]/80 mb-4">
+        Build Your Profile, Showcase Your Work, and Grow With Direction
       </h1>
 
       <Link
