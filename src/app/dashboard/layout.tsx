@@ -3,13 +3,11 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { GiRoundShield } from "react-icons/gi";
-import { TbBrandGoogleAnalytics } from "react-icons/tb";
+import { BsLayoutSidebarReverse } from "react-icons/bs";
 import {
   FiFileText,
   FiMap,
   FiUser,
-  FiChevronLeft,
-  FiChevronRight,
   FiMail,
   FiBell,
   FiSettings,
@@ -66,12 +64,12 @@ export default function DashboardLayout({
           </div>
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="w-6 h-6 rounded-sm border border-white/10 flex items-center justify-center text-white/40 hover:text-white/80 hover:border-white/25 transition-all duration-200"
+            className=" rounded-sm flex items-center justify-center text-white/40 hover:text-white/80 hover:border-white/25 transition-all duration-200"
           >
             {collapsed ? (
-              <FiChevronRight size={12} />
+              <BsLayoutSidebarReverse size={15} />
             ) : (
-              <FiChevronLeft size={12} />
+              <BsLayoutSidebarReverse size={15} />
             )}
           </button>
         </div>

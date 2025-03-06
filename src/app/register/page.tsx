@@ -57,8 +57,8 @@ export default function RegisterPage() {
         {/* Center content */}
         <div className="w-full max-w-md text-white">
           {/* Title */}
-          <h1 className="text-2xl sm:text-3xl tracking-tight mb-2 text-white flex items-center gap-2">
-            <GiRoundShield size={28} />
+          <h1 className="text-[15px] sm:text-[25px] tracking-tight mb-2 text-white flex items-center gap-2">
+            <GiRoundShield size={35} />
             Create an account
           </h1>
 

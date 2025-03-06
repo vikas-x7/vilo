@@ -7,7 +7,6 @@ import { SiFuturelearn } from "react-icons/si";
 
 export const Hero = () => (
   <section className="relative flex flex-col items-center justify-center text-center overflow-hidden mt-16 sm:mt-20 md:mt-24 px-4 sm:px-6 lg:px-8">
-    {/* Top Badge */}
     <div className="relative z-10 flex flex-col items-center w-full max-w-3xl mx-auto">
       <div className="flex items-center gap-0 border border-stone-300 rounded-sm overflow-hidden shadow-sm">
         <span className="px-3 sm:px-4 py-1.5 text-xs text-black bg-[#f0ede7] border-r border-stone-300">
@@ -21,19 +20,16 @@ export const Hero = () => (
         </a>
       </div>
 
-      {/* Heading */}
-      <h1 className="text-4xl sm:text-5xl md:text-[50px] font-bold text-[#E6ECEC] leading-[1.05] tracking-tight mb-6 mt-4">
-        LaTeX Documents Developer Portfolios Learning Roadmaps
+      <h1 className="text-4xl sm:text-5xl md:text-[47px] font-bold text-[#E6ECEC] leading-[1.05] tracking-tight mb-6 mt-4">
+        LaTeX Documents Developer <br /> Portfolios Learning Roadmaps
       </h1>
 
-      {/* Subheading */}
       <p className="text-sm text-[#9A9996] max-w-lg mx-auto">
         Write with precision, showcase with confidence, and learn with clarity —
         all inside one focused platform built for developers.
       </p>
     </div>
 
-    {/* Hero Image */}
     <div className="relative w-full max-w-6xl mt-12 sm:mt-16 md:mt-20 px-0">
       <img
         className="w-full rounded-sm"
@@ -41,7 +37,7 @@ export const Hero = () => (
         alt=""
       />
       <img
-        className="absolute w-[calc(100%-4.5rem)] rounded-[8px]"
+        className="absolute w-[calc(100%-4.5rem)] rounded-lg"
         style={{
           left: "2.25rem",
           right: "2.25rem",
@@ -63,10 +59,8 @@ export const Hero = () => (
       </h1>
     </div>
 
-    {/* Cards */}
     <div className="flex flex-col sm:flex-row justify-center gap-1 mt-6 mb-24 w-full max-w-6xl">
-      {/* Image Card */}
-      <div className="w-full sm:w-64 md:w-72 h-72 sm:h-80 rounded-sm overflow-hidden relative flex-shrink-0">
+      <div className="w-full sm:w-64 md:w-72 h-72 sm:h-80 rounded-sm overflow-hidden relative shrink-0">
         <img
           src="https://i.pinimg.com/736x/ca/eb/4d/caeb4de0657fb92409b28549d36cabdc.jpg"
           alt="visual"
@@ -77,7 +71,6 @@ export const Hero = () => (
         </h1>
       </div>
 
-      {/* Card 1 */}
       <a
         href="#"
         className="w-full sm:w-64 md:w-72 bg-[#1B1913] text-[#EDECEC] text-sm text-start rounded-sm border border-[#393732]/20 p-6 flex flex-col justify-between transition-all"
@@ -125,7 +118,6 @@ export const Hero = () => (
         </div>
       </a>
 
-      {/* Card 3 */}
       <a
         href="#"
         className="w-full sm:w-64 md:w-72 bg-[#1B1913] text-[#EDECEC] text-sm text-start rounded-sm border border-[#393732]/20 p-6 flex flex-col justify-between transition-all"
@@ -150,7 +142,6 @@ export const Hero = () => (
       </a>
     </div>
 
-    {/* CTA Section */}
     <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 mb-16 mt-16 px-2">
       <div className="flex-col text-start w-full md:max-w-xl">
         <h2 className="text-2xl sm:text-3xl text-[#EDECEC] mb-2">
@@ -171,8 +162,8 @@ export const Hero = () => (
 
       <div className="flex relative justify-center w-full md:w-auto">
         <img
-          className="w-full max-w-xs sm:max-w-sm md:w-[450px] opacity-30
-            [mask-image:radial-gradient(circle_at_center,black_5%,transparent_100%)]
+          className="w-full max-w-xs sm:max-w-sm md:w-112.5 opacity-30
+            mask-[radial-gradient(circle_at_center,black_5%,transparent_100%)]
             [-webkit-mask-image:radial-gradient(circle_at_center,black_5%,transparent_100%)]
             [mask-repeat:no-repeat]
             [mask-size:100%_100%]"
@@ -182,7 +173,6 @@ export const Hero = () => (
       </div>
     </div>
 
-    {/* Bottom CTA Banner */}
     <div className="w-full max-w-6xl rounded-sm bg-[#1B1913] border border-[#393732]/20 mb-16 flex flex-col items-center justify-center py-16 px-6 mt-20 sm:mt-32 md:mt-40 text-center">
       <h1 className="text-[#E6ECEC]/80 mb-4 text-sm sm:text-base">
         Build Your Profile, Showcase Your Work, and Grow With Direction
