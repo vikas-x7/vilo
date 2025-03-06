@@ -207,7 +207,7 @@ export default function RoadmapPage() {
   };
 
   const handleCardClick = (id: string) => {
-    router.push(`/roadmap/${id}`);
+    router.push(`/dashboard/roadmap/${id}`);
   };
 
   return (
@@ -307,24 +307,19 @@ function RoadmapCard({
       onClick={onClick}
       className="group relative flex flex-col bg-[#1B1913] border border-white/5 hover:border-white/15 rounded-sm overflow-hidden transition-all duration-200 cursor-pointer"
     >
-      {/* Image */}
-      <div className="w-full h-32 overflow-hidden">
-        <img
-          src="https://i.pinimg.com/1200x/97/4d/ef/974def37a889f0b0707d65bf6d0fd62a.jpg"
-          alt=""
-          className="opacity-50"
-        />
-      </div>
-
       {/* Content */}
       <div className="flex items-start justify-between px-4 py-3.5">
         <div className="flex-1 min-w-0 pr-3">
-          <p className="text-sm text-white/70 group-hover:text-white/90 transition-colors leading-tight">
+          <p className="text-[18px] text-white/70 group-hover:text-white/90 transition-colors leading-tight">
             {item.name}
           </p>
           <p className="text-[11px] text-white/25 mt-1 leading-relaxed line-clamp-2">
             {item.desc}
           </p>
+
+          <button className="text-[10px] bg-white/60 py-1 px-2 text-black/90 mt-5 rounded-[3px]">
+            Start now{" "}
+          </button>
         </div>
         <button
           onClick={(e) => {
