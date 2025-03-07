@@ -14,7 +14,8 @@ import {
   FiLogOut,
 } from "react-icons/fi";
 import { CiGlobe } from "react-icons/ci";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const navItems = [
   { href: "/dashboard/latex", label: "LaTeX", icon: FiFileText },
@@ -41,14 +42,20 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem("user_id")) {
+      router.push("/login");
+    }
+  }, [router]);
 
   return (
     <div className="flex h-screen bg-[#14120B] text-white overflow-hidden font-gothic">
       <aside
-        className={`${
-          collapsed ? "w-14" : "w-56"
-        } bg-[#1B1913] border-r border-white/5 hidden md:flex flex-col shrink-0 transition-all duration-300 ease-in-out relative`}
+        className={`${collapsed ? "w-14" : "w-56"
+          } bg-[#1B1913] border-r border-white/5 hidden md:flex flex-col shrink-0 transition-all duration-300 ease-in-out relative`}
       >
         {/* Logo */}
         <div
@@ -83,13 +90,11 @@ export default function DashboardLayout({
                 key={href}
                 href={href}
                 title={collapsed ? label : undefined}
-                className={`flex items-center gap-3 px-3 py-2 rounded-sm transition-all duration-200 ${
-                  collapsed ? "justify-center" : ""
-                } ${
-                  isActive
+                className={`flex items-center gap-3 px-3 py-2 rounded-sm transition-all duration-200 ${collapsed ? "justify-center" : ""
+                  } ${isActive
                     ? "bg-white/8 text-white/90"
                     : "text-white/40 hover:text-white/80 hover:bg-white/5"
-                }`}
+                  }`}
               >
                 <Icon
                   size={15}
@@ -110,7 +115,7 @@ export default function DashboardLayout({
                 <p className="text-[10px] text-white/20 px-3 mb-1.5 uppercase tracking-widest">
                   Profile
                 </p>
-                {profileItems.map(({ label, icon: Icon, badge }) => (
+                {profileItems.map(({ label, icon: Icon, badge }: any) => (
                   <button
                     key={label}
                     className="w-full flex items-center gap-3 px-3 py-2 text-sm text-white/50 hover:text-white/90 hover:bg-white/5 rounded-sm transition-all duration-200"
@@ -131,7 +136,7 @@ export default function DashboardLayout({
           {/* Collapsed — sirf icons */}
           {collapsed && (
             <div className="flex flex-col px-2 pb-2 gap-0.5 border-t border-white/5 pt-2">
-              {profileItems.map(({ label, icon: Icon }) => (
+              {profileItems.map(({ label, icon: Icon }: any) => (
                 <button
                   key={label}
                   title={label}

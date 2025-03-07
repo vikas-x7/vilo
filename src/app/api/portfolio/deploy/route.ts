@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { portfolioSchema } from "@/modules/portfolio/portfolio.validation";
 import { portfolioService } from "@/modules/portfolio/portfolio.service";
 import { getCurrentUser } from "@/lib/getCurrentUser";
 
@@ -11,12 +10,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body: unknown = await req.json();
-    const parsed = portfolioSchema.parse(body);
+    const result = await portfolioService.deploy(user.id);
 
-    await portfolioService.save(user.id, parsed.data);
-
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json(result, { status: 200 });
   } catch (error: unknown) {
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 400 });

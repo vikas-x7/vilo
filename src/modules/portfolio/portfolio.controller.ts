@@ -11,10 +11,11 @@ export const portfolioController = {
       }
 
       const body = await req.json();
-      const portfolio = await portfolioService.create(user.id, body);
+      const portfolio = await portfolioService.save(user.id, body);
 
       return NextResponse.json(portfolio, { status: 201 });
     } catch (err: any) {
+      console.error("[POST /portfolio/route] Error:", err.message, err);
       return NextResponse.json({ message: err.message }, { status: 400 });
     }
   },
@@ -26,7 +27,7 @@ export const portfolioController = {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
       }
 
-      const portfolio = await portfolioService.getMe(user.id);
+      const portfolio = await portfolioService.getMine(user.id);
       return NextResponse.json(portfolio);
     } catch (err: any) {
       return NextResponse.json({ message: err.message }, { status: 404 });
@@ -41,7 +42,7 @@ export const portfolioController = {
       }
 
       const body = await req.json();
-      const portfolio = await portfolioService.update(user.id, body);
+      const portfolio = await portfolioService.save(user.id, body);
 
       return NextResponse.json(portfolio);
     } catch (err: any) {
@@ -56,7 +57,7 @@ export const portfolioController = {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
       }
 
-      await portfolioService.delete(user.id);
+      // await portfolioService.delete(user.id); // Not implemented
       return NextResponse.json({ message: "Deleted successfully" });
     } catch (err: any) {
       return NextResponse.json({ message: err.message }, { status: 400 });

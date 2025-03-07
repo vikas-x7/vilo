@@ -1,12 +1,14 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "User" (
+    "id" SERIAL NOT NULL,
+    "email" TEXT NOT NULL,
+    "username" TEXT,
+    "password" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
-  - Added the required column `updatedAt` to the `User` table without a default value. This is not possible if the table is not empty.
-
-*/
--- AlterTable
-ALTER TABLE "User" ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL;
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Latex" (
@@ -32,10 +34,9 @@ CREATE TABLE "LatexVersion" (
 -- CreateTable
 CREATE TABLE "Portfolio" (
     "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
-    "template" TEXT NOT NULL,
     "data" JSONB NOT NULL,
-    "deployLink" TEXT,
+    "isPublished" BOOLEAN NOT NULL DEFAULT false,
+    "userId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -46,7 +47,7 @@ CREATE TABLE "Portfolio" (
 CREATE TABLE "Roadmap" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
+    "data" JSONB NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -54,31 +55,25 @@ CREATE TABLE "Roadmap" (
 );
 
 -- CreateTable
-CREATE TABLE "RoadmapStep" (
-    "id" SERIAL NOT NULL,
-    "title" TEXT NOT NULL,
-    "content" TEXT NOT NULL,
-    "order" INTEGER NOT NULL,
-    "roadmapId" INTEGER NOT NULL,
-
-    CONSTRAINT "RoadmapStep_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "UserRoadmap" (
+CREATE TABLE "RoadmapBookmark" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
     "roadmapId" INTEGER NOT NULL,
-    "progress" INTEGER NOT NULL DEFAULT 0,
 
-    CONSTRAINT "UserRoadmap_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "RoadmapBookmark_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Portfolio_userId_key" ON "Portfolio"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserRoadmap_userId_roadmapId_key" ON "UserRoadmap"("userId", "roadmapId");
+CREATE UNIQUE INDEX "RoadmapBookmark_userId_roadmapId_key" ON "RoadmapBookmark"("userId", "roadmapId");
 
 -- AddForeignKey
 ALTER TABLE "Latex" ADD CONSTRAINT "Latex_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -90,10 +85,7 @@ ALTER TABLE "LatexVersion" ADD CONSTRAINT "LatexVersion_latexId_fkey" FOREIGN KE
 ALTER TABLE "Portfolio" ADD CONSTRAINT "Portfolio_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "RoadmapStep" ADD CONSTRAINT "RoadmapStep_roadmapId_fkey" FOREIGN KEY ("roadmapId") REFERENCES "Roadmap"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "RoadmapBookmark" ADD CONSTRAINT "RoadmapBookmark_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "UserRoadmap" ADD CONSTRAINT "UserRoadmap_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "UserRoadmap" ADD CONSTRAINT "UserRoadmap_roadmapId_fkey" FOREIGN KEY ("roadmapId") REFERENCES "Roadmap"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "RoadmapBookmark" ADD CONSTRAINT "RoadmapBookmark_roadmapId_fkey" FOREIGN KEY ("roadmapId") REFERENCES "Roadmap"("id") ON DELETE CASCADE ON UPDATE CASCADE;

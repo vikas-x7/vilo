@@ -1,35 +1,55 @@
+// src/modules/portfolio/portfolio.service.ts
+
 import { portfolioRepository } from "./portfolio.repository";
+import { prisma } from "@/lib/prisma";
+import { PortfolioData, DeployResponse } from "./portfolio.types";
 
 export const portfolioService = {
-  async create(userId: number, data: any) {
-    const existing = await portfolioRepository.findByUserId(userId);
-    if (existing) {
-      throw new Error("Portfolio already exists");
-    }
-    return portfolioRepository.create(userId, data);
+  async save(userId: number, data: PortfolioData) {
+    return portfolioRepository.upsert(userId, data);
   },
 
-  async getMe(userId: number) {
+  async getMine(userId: number) {
+    return portfolioRepository.findByUserId(userId);
+  },
+
+  async deploy(userId: number): Promise<DeployResponse> {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user || !user.username) {
+      throw new Error("Username not set");
+    }
+
     const portfolio = await portfolioRepository.findByUserId(userId);
+
     if (!portfolio) {
       throw new Error("Portfolio not found");
     }
-    return portfolio;
+
+    if (!portfolio.data) {
+      throw new Error("Portfolio data missing");
+    }
+
+    await portfolioRepository.publish(userId);
+
+    return {
+      url: `http://localhost:3000/${user.username}`,
+    };
   },
 
-  async update(userId: number, data: any) {
-    const existing = await portfolioRepository.findByUserId(userId);
-    if (!existing) {
-      throw new Error("Portfolio not found");
-    }
-    return portfolioRepository.update(userId, data);
-  },
+  async getPublic(username: string) {
+    const user = await portfolioRepository.findPublishedByUsername(username);
 
-  async delete(userId: number) {
-    const existing = await portfolioRepository.findByUserId(userId);
-    if (!existing) {
+    if (!user || !user.portfolio) {
       throw new Error("Portfolio not found");
     }
-    return portfolioRepository.delete(userId);
+
+    if (!user.portfolio.isPublished) {
+      throw new Error("Portfolio not published");
+    }
+
+    return user.portfolio;
   },
 };

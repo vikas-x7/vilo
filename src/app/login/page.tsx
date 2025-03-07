@@ -24,7 +24,10 @@ export default function LoginPage() {
 
   const loginMutation = useMutation({
     mutationFn: authService.login,
-    onSuccess: () => {
+    onSuccess: (res: any) => {
+      if (res?.data?.id) {
+        localStorage.setItem("user_id", res.data.id.toString());
+      }
       router.push("/dashboard/latex");
     },
   });

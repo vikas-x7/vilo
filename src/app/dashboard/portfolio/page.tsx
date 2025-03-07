@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { usePortfolioQuery, useSavePortfolio, useDeployPortfolio } from "@/features/portfolio/portfolio.hooks";
 import {
   FiGlobe,
   FiCopy,
@@ -188,34 +189,60 @@ function SidebarSection({
 }
 
 export default function PortfolioPage() {
+  const { data: qData, isLoading } = usePortfolioQuery();
+  const saveMutation = useSavePortfolio();
+  const deployMutation = useDeployPortfolio();
+
   const [data, setData] = useState(defaultData);
+
+  useEffect(() => {
+    if (qData) {
+      setData(qData as any);
+      if (qData.username) setDeployedUrl(`http://localhost:3000/${qData.username}`);
+    }
+  }, [qData]);
+
   const [copied, setCopied] = useState(false);
   const [deployed, setDeployed] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
   const avatarRef = useRef<HTMLInputElement>(null);
-  const deployedUrl = `https://vilo.app/${data.username}`;
+  const [deployedUrl, setDeployedUrl] = useState(`http://localhost:3000/${data.username}`);
+
+  const handleSaveAndDeploy = async () => {
+    try {
+      await saveMutation.mutateAsync();
+      const res = await deployMutation.mutateAsync();
+      if (res && res.url) {
+        setDeployedUrl(res.url);
+      }
+      setDeployed(true);
+    } catch (e) {
+      console.error("Failed to deploy:", e);
+      alert("Deployment failed. Please try again.");
+    }
+  };
 
   const set = (key: keyof typeof defaultData, val: any) =>
     setData((p) => ({ ...p, [key]: val }));
 
-  const updateItem = <T extends { id: number }>(
-    key: keyof typeof defaultData,
+  const updateItem = <K extends "experience" | "projects" | "education" | "activities">(
+    key: K,
     id: number,
-    patch: Partial<T>,
+    patch: Partial<(typeof defaultData)[K][0]>,
   ) =>
     set(
       key,
-      (data[key] as T[]).map((x) => (x.id === id ? { ...x, ...patch } : x)),
+      ((data[key] as any[])).map((x) => (x.id === id ? { ...x, ...patch } : x)),
     );
 
-  const removeItem = <T extends { id: number }>(
-    key: keyof typeof defaultData,
+  const removeItem = <K extends "experience" | "projects" | "education" | "activities">(
+    key: K,
     id: number,
   ) =>
     set(
       key,
-      (data[key] as T[]).filter((x) => x.id !== id),
+      ((data[key] as any[])).filter((x) => x.id !== id),
     );
 
   const handleCopy = () => {
@@ -631,9 +658,8 @@ export default function PortfolioPage() {
 
         {/* ── Right Sidebar ── */}
         <div
-          className={`shrink-0 border-l border-white/5 bg-[#171510] overflow-hidden flex flex-col transition-all duration-300 ease-in-out ${
-            rightSidebarOpen ? "w-110" : "w-0 border-l-0"
-          }`}
+          className={`shrink-0 border-l border-white/5 bg-[#171510] overflow-hidden flex flex-col transition-all duration-300 ease-in-out ${rightSidebarOpen ? "w-110" : "w-0 border-l-0"
+            }`}
         >
           <div className="w-110 flex flex-col h-full">
             {/* Panel Header */}
@@ -697,11 +723,12 @@ export default function PortfolioPage() {
               {/* Publish */}
               <SidebarSection label="Publish">
                 <button
-                  onClick={() => setDeployed(true)}
-                  className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 text-[12px] font-semibold text-black/80 bg-[#F0EDE7] hover:bg-white rounded-sm transition-all mb-3"
+                  onClick={handleSaveAndDeploy}
+                  disabled={saveMutation.isPending || deployMutation.isPending}
+                  className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 text-[12px] font-semibold text-black/80 bg-[#F0EDE7] hover:bg-white rounded-sm transition-all mb-3 disabled:opacity-50"
                 >
                   <FiZap size={12} />
-                  {deployed ? "Re-deploy" : "Deploy"}
+                  {saveMutation.isPending || deployMutation.isPending ? "Deploying..." : deployed ? "Re-deploy" : "Deploy"}
                 </button>
                 {deployed && (
                   <div className="bg-green-950/30 border border-green-500/10 rounded-sm px-3 py-2.5 space-y-2">

@@ -8,13 +8,19 @@ export const api = axios.create({
   },
 });
 
-// Request Interceptor (future me token lagane ke liye)
-// api.interceptors.request.use((config) => {
-//   // example:
-//   // const token = localStorage.getItem("token");
-//   // if (token) config.headers.Authorization = `Bearer ${token}`;
-//   return config;
-// });
+// Request Interceptor
+api.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const userId = localStorage.getItem("user_id");
+    console.log("[Axios] Request interceptor user_id:", userId);
+    if (userId) {
+      config.headers["x-user-id"] = userId;
+    } else {
+      console.warn("[Axios] No user_id found in localStorage! Next request will likely 401.");
+    }
+  }
+  return config;
+});
 
 // Response Interceptor (global error handle)
 api.interceptors.response.use(

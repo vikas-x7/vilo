@@ -19,7 +19,10 @@ export default function RegisterPage() {
 
   const registerMutation = useMutation({
     mutationFn: authService.register,
-    onSuccess: () => {
+    onSuccess: (res: any) => {
+      if (res?.data?.id) {
+        localStorage.setItem("user_id", res.data.id.toString());
+      }
       router.push("/login");
     },
   });

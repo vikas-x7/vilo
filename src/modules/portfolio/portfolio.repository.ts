@@ -1,33 +1,42 @@
+// src/modules/portfolio/portfolio.repository.ts
+
 import { prisma } from "@/lib/prisma";
+import { PortfolioData } from "./portfolio.types";
 
 export const portfolioRepository = {
-  findByUserId(userId: number) {
+  async findByUserId(userId: number) {
     return prisma.portfolio.findUnique({
       where: { userId },
     });
   },
 
-  create(userId: number, data: any) {
-    return prisma.portfolio.create({
-      data: {
+  async upsert(userId: number, data: PortfolioData) {
+    return prisma.portfolio.upsert({
+      where: { userId },
+      update: {
+        data: data as any,
+        isPublished: false,
+      },
+      create: {
         userId,
-        data,
+        data: data as any,
       },
     });
   },
 
-  update(userId: number, data: any) {
+  async publish(userId: number) {
     return prisma.portfolio.update({
       where: { userId },
       data: {
-        data,
+        isPublished: true,
       },
     });
   },
 
-  delete(userId: number) {
-    return prisma.portfolio.delete({
-      where: { userId },
+  async findPublishedByUsername(username: string) {
+    return prisma.user.findUnique({
+      where: { username },
+      include: { portfolio: true },
     });
   },
 };
