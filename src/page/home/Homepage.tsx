@@ -67,7 +67,7 @@ export const Hero = () => (
           className="w-full h-full object-cover opacity-50"
         />
         <h1 className="absolute bottom-6 left-6 text-white text-[16px]">
-          Our Services
+          Platform Features
         </h1>
       </div>
 

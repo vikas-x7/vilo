@@ -48,11 +48,13 @@ model Portfolio {
 }
 
 model Roadmap {
-  id        Int      @id @default(autoincrement())
-  title     String
-  data      Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  title       String
+  slug        String   @unique
+  description String
+  data        Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   bookmarks RoadmapBookmark[]
 }
