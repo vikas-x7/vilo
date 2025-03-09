@@ -10,7 +10,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   return Response.json(data);
 }
 
-export async function DELETE(_: NextRequest, { params }: Params) {
-  const data = await roadmapController.delete(params.slug);
+export async function DELETE(req: NextRequest, { params }: Params) {
+  const data = await roadmapController.delete(req, params.slug);
   return Response.json(data);
 }

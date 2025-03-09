@@ -1,5 +1,3 @@
-// src/modules/portfolio/portfolio.repository.ts
-
 import { prisma } from "@/lib/prisma";
 import { PortfolioData } from "./portfolio.types";
 

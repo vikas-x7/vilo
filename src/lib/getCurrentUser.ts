@@ -9,3 +9,9 @@ export async function getCurrentUser(req: NextRequest) {
     where: { id: Number(userId) },
   });
 }
+export async function getAuthUser() {
+  return {
+    id: 1,
+    isAdmin: true, // force admin for now
+  };
+}

@@ -1,16 +1,16 @@
 import { NextRequest } from "next/server";
 import { bookmarkService } from "./bookmark.service";
 import { bookmarkValidation } from "./validation";
-import { getAuthUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/getCurrentUser";
 
 export const bookmarkController = {
-  async getUserBookmarks() {
-    const user = await getAuthUser();
+  async getUserBookmarks(req: NextRequest) {
+    const user = await getCurrentUser(req);
     return bookmarkService.getUserBookmarks(user);
   },
 
   async add(req: NextRequest) {
-    const user = await getAuthUser();
+    const user = await getCurrentUser(req);
     const body = await req.json();
 
     const parsed = bookmarkValidation.parse(body);
@@ -19,7 +19,7 @@ export const bookmarkController = {
   },
 
   async remove(req: NextRequest) {
-    const user = await getAuthUser();
+    const user = await getCurrentUser(req);
     const body = await req.json();
 
     const parsed = bookmarkValidation.parse(body);

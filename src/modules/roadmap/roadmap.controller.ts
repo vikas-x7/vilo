@@ -1,7 +1,10 @@
 import { NextRequest } from "next/server";
 import { roadmapService } from "./roadmap.service";
-import { createRoadmapValidation, updateRoadmapValidation } from "./validation";
-import { getAuthUser } from "@/lib/auth";
+import {
+  createRoadmapValidation,
+  updateRoadmapValidation,
+} from "./roadmap.validator";
+import { getCurrentUser } from "@/lib/getCurrentUser";
 
 export const roadmapController = {
   async getAll() {
@@ -13,7 +16,7 @@ export const roadmapController = {
   },
 
   async create(req: NextRequest) {
-    const user = await getAuthUser();
+    const user = await getCurrentUser(req);
     const body = await req.json();
 
     const parsed = createRoadmapValidation.parse(body);
@@ -22,7 +25,7 @@ export const roadmapController = {
   },
 
   async update(req: NextRequest, slug: string) {
-    const user = await getAuthUser();
+    const user = await getCurrentUser(req);
     const body = await req.json();
 
     const parsed = updateRoadmapValidation.parse(body);
@@ -30,8 +33,8 @@ export const roadmapController = {
     return roadmapService.update(user, slug, parsed);
   },
 
-  async delete(slug: string) {
-    const user = await getAuthUser();
+  async delete(req: NextRequest, slug: string) {
+    const user = await getCurrentUser(req);
     return roadmapService.delete(user, slug);
   },
 };

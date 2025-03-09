@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import { bookmarkController } from "@/modules/bookmark/bookmark.controller";
 
-export async function GET() {
-  const data = await bookmarkController.getUserBookmarks();
+export async function GET(req: NextRequest) {
+  const data = await bookmarkController.getUserBookmarks(req);
   return Response.json(data);
 }
 
