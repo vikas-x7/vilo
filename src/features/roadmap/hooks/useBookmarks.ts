@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { bookmarkApi } from "../api/bookmark.api";
+import { RoadmapBookmarkItem } from "../types/roadmap.types";
 
 export const useBookmarks = () => {
   const qc = useQueryClient();
@@ -20,7 +21,7 @@ export const useBookmarks = () => {
   });
 
   return {
-    bookmarks: bookmarksQuery.data ?? [],
+    bookmarks: (bookmarksQuery.data ?? []) as RoadmapBookmarkItem[],
     isLoading: bookmarksQuery.isLoading,
     addBookmark: add.mutate,
     removeBookmark: remove.mutate,

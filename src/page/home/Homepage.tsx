@@ -30,9 +30,9 @@ export const Hero = () => (
       </p>
     </div>
 
-    <div className="relative w-full max-w-6xl mt-12 sm:mt-16 md:mt-20 px-0">
+    <div className="relative w-full h-screen max-w-6xl mt-12 sm:mt-16 md:mt-20 px-0">
       <img
-        className="w-full rounded-sm"
+        className="w-full rounded-sm opacity-35"
         src="https://i.pinimg.com/736x/21/ce/52/21ce5263171481886a153ad6ab9d9c92.jpg"
         alt=""
       />

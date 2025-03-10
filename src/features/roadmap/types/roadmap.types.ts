@@ -1,7 +1,15 @@
 export interface RoadmapListItem {
+  id: number;
   title: string;
   slug: string;
   description: string;
+}
+
+export interface RoadmapBookmarkItem {
+  id: number;
+  userId: number;
+  roadmapId: number;
+  roadmap: RoadmapListItem;
 }
 
 export interface ReactFlowNode {

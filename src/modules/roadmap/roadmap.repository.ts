@@ -5,6 +5,7 @@ export const roadmapRepository = {
   findAll() {
     return prisma.roadmap.findMany({
       select: {
+        id: true,
         title: true,
         slug: true,
         description: true,

@@ -10,7 +10,7 @@ interface Props {
 
 export function RoadmapFlow({ roadmap }: Props) {
   return (
-    <div className="h-[80vh]">
+    <div className="h-screen">
       <ReactFlow
         nodes={roadmap.data.nodes}
         edges={roadmap.data.edges}
