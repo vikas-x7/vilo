@@ -13,7 +13,13 @@ export async function findUserById(id: number) {
   });
 }
 
-export async function createUser(data: RegisterInput) {
+export async function findUserByUsername(username: string) {
+  return prisma.user.findUnique({
+    where: { username },
+  });
+}
+
+export async function createUser(data: RegisterInput & { username: string }) {
   return prisma.user.create({
     data,
   });

@@ -1,7 +1,10 @@
 "use client";
 
+import SettingsPanel from "./components/SettingsPanel";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import type { SafeUser } from "@/modules/auth/auth.types";
+import { authService } from "@/services/auth.service";
 import { GiRoundShield } from "react-icons/gi";
 import { BsLayoutSidebarReverse } from "react-icons/bs";
 import {
@@ -10,12 +13,11 @@ import {
   FiUser,
   FiMail,
   FiBell,
-  FiSettings,
   FiLogOut,
+  FiSettings,
 } from "react-icons/fi";
 import { CiGlobe } from "react-icons/ci";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const navItems = [
   { href: "/dashboard/latex", label: "LaTeX", icon: FiFileText },
@@ -26,7 +28,6 @@ const navItems = [
   },
 
   { href: "/dashboard/roadmap", label: "Roadmap", icon: FiMap },
-  { href: "/dashboard/profile", label: "Profile", icon: FiUser },
 ];
 
 const profileItems = [
@@ -43,19 +44,108 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [collapsed, setCollapsed] = useState(false);
+  const [currentUser, setCurrentUser] = useState<SafeUser | null>(null);
+  const [isUserLoading, setIsUserLoading] = useState(true);
+  const isSettingsOpen = searchParams.get("modal") === "settings";
 
   useEffect(() => {
-    if (!localStorage.getItem("user_id")) {
-      router.push("/login");
-    }
+    let isMounted = true;
+
+    const loadCurrentUser = async () => {
+      const userId = localStorage.getItem("user_id");
+
+      if (!userId) {
+        router.replace("/login");
+        return;
+      }
+
+      try {
+        setIsUserLoading(true);
+        const response = await authService.me();
+
+        if (!isMounted) {
+          return;
+        }
+
+        setCurrentUser(response.data);
+      } catch {
+        localStorage.removeItem("user_id");
+
+        if (isMounted) {
+          setCurrentUser(null);
+          router.replace("/login");
+        }
+      } finally {
+        if (isMounted) {
+          setIsUserLoading(false);
+        }
+      }
+    };
+
+    void loadCurrentUser();
+
+    return () => {
+      isMounted = false;
+    };
   }, [router]);
+
+  useEffect(() => {
+    if (!isSettingsOpen) {
+      return;
+    }
+
+    const originalOverflow = document.body.style.overflow;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("modal");
+      const query = params.toString();
+
+      router.replace(query ? `${pathname}?${query}` : pathname);
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isSettingsOpen, pathname, router, searchParams]);
+
+  const displayName =
+    currentUser?.username ||
+    currentUser?.email?.split("@")[0] ||
+    (isUserLoading ? "Loading profile..." : "Unknown user");
+  const displayEmail =
+    currentUser?.email ||
+    (isUserLoading ? "Fetching account..." : "No email found");
+  const openSettings = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("modal", "settings");
+    const query = params.toString();
+
+    router.push(query ? `${pathname}?${query}` : pathname);
+  };
+  const closeSettings = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("modal");
+    const query = params.toString();
+
+    router.replace(query ? `${pathname}?${query}` : pathname);
+  };
 
   return (
     <div className="flex h-screen bg-[#14120B] text-white overflow-hidden font-gothic">
       <aside
-        className={`${collapsed ? "w-14" : "w-56"
-          } bg-[#1B1913] border-r border-white/5 hidden md:flex flex-col shrink-0 transition-all duration-300 ease-in-out relative`}
+        className={`${
+          collapsed ? "w-14" : "w-56"
+        } bg-[#1B1913] border-r border-white/5 hidden md:flex flex-col shrink-0 transition-all duration-300 ease-in-out relative`}
       >
         {/* Logo */}
         <div
@@ -90,11 +180,13 @@ export default function DashboardLayout({
                 key={href}
                 href={href}
                 title={collapsed ? label : undefined}
-                className={`flex items-center gap-3 px-3 py-2 rounded-sm transition-all duration-200 ${collapsed ? "justify-center" : ""
-                  } ${isActive
+                className={`flex items-center gap-3 px-3 py-2 rounded-sm transition-all duration-200 ${
+                  collapsed ? "justify-center" : ""
+                } ${
+                  isActive
                     ? "bg-white/8 text-white/90"
                     : "text-white/40 hover:text-white/80 hover:bg-white/5"
-                  }`}
+                }`}
               >
                 <Icon
                   size={15}
@@ -104,39 +196,34 @@ export default function DashboardLayout({
               </Link>
             );
           })}
+          <button
+            type="button"
+            title={collapsed ? "Settings" : undefined}
+            onClick={openSettings}
+            className={`flex items-center gap-3 px-3 py-2 rounded-sm transition-all duration-200 ${
+              collapsed ? "justify-center" : ""
+            } ${
+              isSettingsOpen
+                ? "bg-white/8 text-white/90"
+                : "text-white/40 hover:text-white/80 hover:bg-white/5"
+            }`}
+          >
+            <FiSettings
+              size={15}
+              className={`shrink-0 ${
+                isSettingsOpen ? "text-white/70" : "text-white/30"
+              }`}
+            />
+            {!collapsed && <span>Settings</span>}
+          </button>
         </nav>
 
         {/* Bottom Section */}
         <div className="mt-auto">
-          {/* Profile Items — always visible */}
-          {!collapsed && (
-            <div className="">
-              <div className="border-t border-white/5 pt-3 pb-1 px-1">
-                <p className="text-[10px] text-white/20 px-3 mb-1.5 uppercase tracking-widest">
-                  Profile
-                </p>
-                {profileItems.map(({ label, icon: Icon, badge }: any) => (
-                  <button
-                    key={label}
-                    className="w-full flex items-center gap-3 px-3 py-2 text-sm text-white/50 hover:text-white/90 hover:bg-white/5 rounded-sm transition-all duration-200"
-                  >
-                    <Icon size={15} className="text-white/30 shrink-0" />
-                    <span className="flex-1 text-left">{label}</span>
-                    {badge && (
-                      <span className="text-[10px] border border-white/15 text-white/40 px-1.5 py-0.5 rounded-sm">
-                        {badge}
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Collapsed — sirf icons */}
           {collapsed && (
             <div className="flex flex-col px-2 pb-2 gap-0.5 border-t border-white/5 pt-2">
-              {profileItems.map(({ label, icon: Icon }: any) => (
+              {profileItems.map(({ label, icon: Icon }) => (
                 <button
                   key={label}
                   title={label}
@@ -161,10 +248,10 @@ export default function DashboardLayout({
               {!collapsed && (
                 <div className="flex flex-col items-start flex-1 min-w-0">
                   <span className="text-xs text-white/70 font-medium truncate w-full">
-                    Hecham GAZHI
+                    {displayName}
                   </span>
                   <span className="text-[10px] text-white/30 truncate w-full">
-                    hechamgazhi@gmail.com
+                    {displayEmail}
                   </span>
                 </div>
               )}
@@ -185,6 +272,25 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto">{children}</main>
+
+      {isSettingsOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/65 flex items-center justify-center p-4"
+          onClick={closeSettings}
+        >
+          <div
+            className="w-full max-w-3xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <SettingsPanel
+              variant="modal"
+              initialName={displayName}
+              initialEmail={displayEmail}
+              onClose={closeSettings}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

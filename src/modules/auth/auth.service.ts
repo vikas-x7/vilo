@@ -1,11 +1,44 @@
 import type { User } from "@/lib/prisma";
-import { findUserByEmail, findUserById, createUser } from "./auth.repository";
+import {
+  findUserByEmail,
+  findUserById,
+  findUserByUsername,
+  createUser,
+} from "./auth.repository";
 
 import { RegisterInput, LoginInput, SafeUser } from "./auth.types";
 
 function sanitizeUser(user: User): SafeUser {
-  const { password, ...safeUser } = user;
-  return safeUser;
+  return {
+    id: user.id,
+    email: user.email,
+    username: user.username,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
+}
+
+function createUsernameBase(email: string) {
+  const localPart = email.split("@")[0] ?? "user";
+  const slug = localPart
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return slug || "user";
+}
+
+async function generateUniqueUsername(email: string) {
+  const baseUsername = createUsernameBase(email);
+  let username = baseUsername;
+  let suffix = 1;
+
+  while (await findUserByUsername(username)) {
+    suffix += 1;
+    username = `${baseUsername}-${suffix}`;
+  }
+
+  return username;
 }
 
 export async function registerUser(data: RegisterInput): Promise<SafeUser> {
@@ -15,7 +48,8 @@ export async function registerUser(data: RegisterInput): Promise<SafeUser> {
     throw new Error("User already exists");
   }
 
-  const user = await createUser(data);
+  const username = await generateUniqueUsername(data.email);
+  const user = await createUser({ ...data, username });
 
   return sanitizeUser(user);
 }

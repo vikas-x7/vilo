@@ -11,7 +11,7 @@ export default function RoadmapHeader() {
 
   return (
     <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-      <div>
+      <div className="">
         <h1 className="text-[40px] font-serif">RoadMap</h1>
         <p className="mb-10">
           Explore curated learning paths designed to take you from beginner to
