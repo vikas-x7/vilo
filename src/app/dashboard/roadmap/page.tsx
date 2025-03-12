@@ -74,11 +74,11 @@ export default function RoadmapPage() {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className="w-full p-3 flex flex-col gap-8">
+    <div className=" p-3  gap-8">
       <RoadmapHeader />
 
       {bookmarkedRoadmaps.length > 0 && (
-        <section className="flex flex-col gap-3">
+        <section className="flex flex-col gap-3 mt-10">
           <div className="flex items-center justify-between">
             <h2 className="text-sm uppercase tracking-widest text-white/60">
               Saved Roadmaps

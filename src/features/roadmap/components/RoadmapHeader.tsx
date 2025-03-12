@@ -10,7 +10,7 @@ export default function RoadmapHeader() {
   const setSearch = useRoadmapStore((state) => state.setSearch);
 
   return (
-    <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+    <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between bg-[#14120B]">
       <div className="">
         <h1 className="text-[40px] font-serif">RoadMap</h1>
         <p className="mb-10">

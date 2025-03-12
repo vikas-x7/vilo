@@ -30,13 +30,6 @@ const navItems = [
   { href: "/dashboard/roadmap", label: "Roadmap", icon: FiMap },
 ];
 
-const profileItems = [
-  { label: "Help", icon: FiMail },
-  { label: "Dark Mode", icon: FiBell },
-  { label: "Settings", icon: FiSettings },
-  { label: "Log out", icon: FiLogOut },
-];
-
 export default function DashboardLayout({
   children,
 }: {
@@ -218,26 +211,7 @@ export default function DashboardLayout({
           </button>
         </nav>
 
-        {/* Bottom Section */}
         <div className="mt-auto">
-          {/* Collapsed — sirf icons */}
-          {collapsed && (
-            <div className="flex flex-col px-2 pb-2 gap-0.5 border-t border-white/5 pt-2">
-              {profileItems.map(({ label, icon: Icon }) => (
-                <button
-                  key={label}
-                  title={label}
-                  className="flex justify-center py-2 text-white/30 hover:text-white/70 hover:bg-white/5 rounded-sm transition-all duration-200"
-                >
-                  <Icon size={15} />
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Terms */}
-
-          {/* User Card */}
           <div className="border-t border-white/5">
             <div
               className={`w-full flex items-center gap-3 px-4 py-3 ${collapsed ? "justify-center" : ""}`}

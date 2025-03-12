@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { usePortfolioQuery, useSavePortfolio, useDeployPortfolio } from "@/features/portfolio/portfolio.hooks";
+import { useState, useRef, useEffect, createRef } from "react";
+import { usePortfolioQuery, useSavePortfolio, useDeployPortfolio, useUploadPortfolioImage, PortfolioData } from "@/features/portfolio";
 import {
   FiGlobe,
   FiCopy,
@@ -189,29 +189,30 @@ function SidebarSection({
 }
 
 export default function PortfolioPage() {
-  const { data: qData, isLoading } = usePortfolioQuery();
+  const { data: qData } = usePortfolioQuery();
   const saveMutation = useSavePortfolio();
   const deployMutation = useDeployPortfolio();
+  const uploadImageMutation = useUploadPortfolioImage();
 
-  const [data, setData] = useState(defaultData);
-
-  useEffect(() => {
-    if (qData) {
-      setData(qData as any);
-      if (qData.username) setDeployedUrl(`http://localhost:3000/${qData.username}`);
-    }
-  }, [qData]);
-
+  const [data, setData] = useState<PortfolioData>(defaultData as PortfolioData);
+  const [deployedUrl, setDeployedUrl] = useState(`http://localhost:3000/${(defaultData as PortfolioData).username}`);
   const [copied, setCopied] = useState(false);
   const [deployed, setDeployed] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
-  const avatarRef = useRef<HTMLInputElement>(null);
-  const [deployedUrl, setDeployedUrl] = useState(`http://localhost:3000/${data.username}`);
+  const [avatarRef] = useState(() => createRef<HTMLInputElement>());
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  useEffect(() => {
+    if (qData) {
+      setData(qData);
+      setDeployedUrl(`http://localhost:3000/${qData.username}`);
+    }
+  }, [qData]);
 
   const handleSaveAndDeploy = async () => {
     try {
-      await saveMutation.mutateAsync();
+      await saveMutation.mutateAsync(data);
       const res = await deployMutation.mutateAsync();
       if (res && res.url) {
         setDeployedUrl(res.url);
@@ -251,9 +252,24 @@ export default function PortfolioPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) set("avatar", URL.createObjectURL(file));
+    if (!file) return;
+
+    setUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await uploadImageMutation.mutateAsync(formData);
+      if (res && res.url) {
+        set("avatar", res.url);
+      }
+    } catch (err) {
+      console.error("Failed to upload image:", err);
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setUploadingAvatar(false);
+    }
   };
 
   const totalSections =
@@ -276,11 +292,17 @@ export default function PortfolioPage() {
                 <img
                   src={data.avatar}
                   alt="avatar"
-                  className="w-20 h-20 rounded-full border border-white/10 object-cover"
+                  className={`w-20 h-20 rounded-full border border-white/10 object-cover ${uploadingAvatar ? "opacity-50" : ""}`}
                 />
+                {uploadingAvatar && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white/80 rounded-full animate-spin" />
+                  </div>
+                )}
                 <button
                   onClick={() => avatarRef.current?.click()}
                   className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  disabled={uploadingAvatar}
                 >
                   <FiEdit2 size={14} className="text-white/70" />
                 </button>

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { PortfolioData } from "./types";
+import { PortfolioData } from "../types/portfolio.types";
 
 interface PortfolioState {
     data: PortfolioData | null;

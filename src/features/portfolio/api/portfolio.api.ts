@@ -1,18 +1,16 @@
 import { api } from "@/lib/axios";
-import { PortfolioData } from "./types";
-import { adaptPortfolioToFrontend, adaptPortfolioToBackend } from "./portfolio.adapter";
+import { PortfolioData } from "../types/portfolio.types";
+import { adaptPortfolioToFrontend, adaptPortfolioToBackend } from "../adapters/portfolio.adapter";
 
 export const portfolioApi = {
     async getMine(): Promise<PortfolioData | null> {
         try {
             const res = await api.get("/portfolio/me");
             if (res.data) {
-                // res.data is likely the Portfolio Prisma object which contains data
                 return adaptPortfolioToFrontend(res.data.data, res.data.user?.username || "");
             }
             return null;
-        } catch (e) {
-            // Return null instead of throwing if not found
+        } catch {
             return null;
         }
     },
@@ -24,6 +22,15 @@ export const portfolioApi = {
 
     async deploy(): Promise<{ url: string }> {
         const res = await api.post<{ url: string }>("/portfolio/deploy");
+        return res.data;
+    },
+
+    async uploadImage(formData: FormData): Promise<{ url: string }> {
+        const res = await api.post<{ url: string }>("/portfolio/upload", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
         return res.data;
     },
 };

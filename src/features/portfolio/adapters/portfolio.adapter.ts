@@ -1,4 +1,4 @@
-import { PortfolioData as FrontendPortfolioData } from "./types";
+import { PortfolioData as FrontendPortfolioData } from "../types/portfolio.types";
 import { PortfolioData as BackendPortfolioData } from "@/modules/portfolio/portfolio.types";
 
 export function adaptPortfolioToFrontend(
@@ -79,13 +79,13 @@ export function adaptPortfolioToBackend(fe: FrontendPortfolioData): BackendPortf
         projects: fe.projects.map((p) => ({
             title: p.name || "Project",
             description: p.desc || "Description",
-            techStack: ["N/A"], // Required by schema
+            techStack: ["N/A"],
             liveUrl: p.link || undefined,
         })),
         education: fe.education.map((e) => ({
             institution: e.school || "School",
             degree: e.degree || "Degree",
-            field: "N/A", // Required by schema
+            field: "N/A",
             startYear: e.year || "2024",
         })),
         contact: {

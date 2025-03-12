@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { portfolioService } from "@/modules/portfolio/portfolio.service";
 import PortfolioRenderer from "@/features/portfolio/components/PortfolioRenderer";
-import { adaptPortfolioToFrontend } from "@/features/portfolio/portfolio.adapter";
+import { adaptPortfolioToFrontend } from "@/features/portfolio";
 
 interface Params {
     params: Promise<{
