@@ -38,13 +38,14 @@ model LatexVersion {
 }
 
 model Portfolio {
-  id          Int      @id @default(autoincrement())
-  data        Json
-  isPublished Boolean  @default(false)
-  userId      Int      @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  data       Json
+  isPublic   Boolean  @default(true)
+  isDeployed Boolean  @default(false)
+  userId     Int      @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Roadmap {

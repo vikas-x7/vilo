@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { portfolioService } from "@/modules/portfolio/portfolio.service";
+import { createPortfolioResponse } from "@/modules/portfolio/portfolio.response";
 import { getCurrentUser } from "@/lib/getCurrentUser";
 
 export async function GET(req: NextRequest) {
@@ -11,8 +12,17 @@ export async function GET(req: NextRequest) {
     }
 
     const portfolio = await portfolioService.getMine(user.id);
+    const response = createPortfolioResponse({
+      portfolio,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      },
+      origin: req.nextUrl.origin,
+    });
 
-    return NextResponse.json(portfolio, { status: 200 });
+    return NextResponse.json(response, { status: 200 });
   } catch (error: unknown) {
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 400 });

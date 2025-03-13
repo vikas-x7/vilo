@@ -9,23 +9,24 @@ interface Props {
 }
 
 export default function PortfolioRenderer({ data }: Props) {
-  const totalSections =
-    (data.experience.length > 0 ? 1 : 0) +
-    (data.projects.length > 0 ? 1 : 0) +
-    (data.education.length > 0 ? 1 : 0) +
-    (data.activities.length > 0 ? 1 : 0) +
-    (data.skills.length > 0 ? 1 : 0);
+  const avatarFallback = (data.name.trim()[0] ?? data.username.trim()[0] ?? "U").toUpperCase();
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#14120B] font-gothic text-white">
-      <div className="max-w-2xl mx-auto px-8 py-10 space-y-10">
+    <div className="flex flex-col min-h-screen bg-[#14120B]  font-gothic text-white">
+      <div className="w-3xl mx-auto px-8 py-10 space-y-10">
         {/* Hero */}
         <div className="flex items-start gap-5 pb-8 border-b border-white/5">
-          <img
-            src={data.avatar}
-            alt="avatar"
-            className="w-20 h-20 rounded-full border border-white/10 object-cover"
-          />
+          {data.avatar ? (
+            <img
+              src={data.avatar}
+              alt="avatar"
+              className="w-20 h-20 rounded-full border border-white/10 object-cover"
+            />
+          ) : (
+            <div className="w-20 h-20 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-lg text-white/45">
+              {avatarFallback}
+            </div>
+          )}
           <div className="flex-1 space-y-1">
             <h1 className="text-2xl text-white/90 tracking-tight font-medium">
               {data.name}

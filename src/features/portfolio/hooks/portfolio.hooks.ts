@@ -20,20 +20,31 @@ export function usePortfolioQuery() {
 
 export function useSavePortfolio() {
     const queryClient = useQueryClient();
+    const setData = usePortfolioStore((s) => s.setData);
 
-    return useMutation<void, Error, PortfolioData>({
+    return useMutation<PortfolioData, Error, PortfolioData>({
         mutationFn: async (data: PortfolioData) => {
-            await portfolioApi.save(data);
+            return portfolioApi.save(data);
         },
-        onSuccess: () => {
+        onSuccess: (savedData) => {
+            setData(savedData);
+            queryClient.setQueryData(["portfolio"], savedData);
             queryClient.invalidateQueries({ queryKey: ["portfolio"] });
         },
     });
 }
 
 export function useDeployPortfolio() {
-    return useMutation<{ url: string }, Error, void>({
+    const queryClient = useQueryClient();
+    const setData = usePortfolioStore((s) => s.setData);
+
+    return useMutation<PortfolioData, Error, void>({
         mutationFn: async () => await portfolioApi.deploy(),
+        onSuccess: (deployedData) => {
+            setData(deployedData);
+            queryClient.setQueryData(["portfolio"], deployedData);
+            queryClient.invalidateQueries({ queryKey: ["portfolio"] });
+        },
     });
 }
 

@@ -40,4 +40,7 @@ export interface PortfolioData {
     email: string;
     github: string;
     linkedin: string;
+    isPublic: boolean;
+    isDeployed: boolean;
+    deployedUrl: string;
 }

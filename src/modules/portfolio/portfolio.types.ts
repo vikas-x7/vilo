@@ -56,6 +56,38 @@ export interface PortfolioData {
   contact: Contact;
 }
 
-export interface DeployResponse {
-  url: string;
+export interface PortfolioOwner {
+  id: number;
+  username: string;
+  email: string;
+}
+
+export interface PortfolioRecord {
+  id: number;
+  data: PortfolioData;
+  isPublic: boolean;
+  isDeployed: boolean;
+  userId: number;
+  user: PortfolioOwner;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SavePortfolioInput {
+  data: PortfolioData;
+  username: string;
+  isPublic: boolean;
+}
+
+export interface PortfolioApiResponse {
+  user: PortfolioOwner;
+  portfolio: {
+    id: number;
+    data: PortfolioData;
+    isPublic: boolean;
+    isDeployed: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  } | null;
+  deploymentUrl: string;
 }

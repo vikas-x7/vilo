@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { portfolioService } from "@/modules/portfolio/portfolio.service";
+import type { PortfolioData as BackendPortfolioData } from "@/modules/portfolio/portfolio.types";
 import PortfolioRenderer from "@/features/portfolio/components/PortfolioRenderer";
 import { adaptPortfolioToFrontend } from "@/features/portfolio";
 
@@ -10,13 +11,17 @@ interface Params {
 }
 
 export default async function Page({ params }: Params) {
-    try {
-        const { username } = await params;
-        const pub = await portfolioService.getPublic(username);
-        const data = adaptPortfolioToFrontend(pub.data as any, username);
+    const { username } = await params;
 
-        return <PortfolioRenderer data={data} />;
+    let pub;
+
+    try {
+        pub = await portfolioService.getPublic(username);
     } catch {
         notFound();
     }
+
+    const data = adaptPortfolioToFrontend(pub.data as unknown as BackendPortfolioData, { username });
+
+    return <PortfolioRenderer data={data} />;
 }

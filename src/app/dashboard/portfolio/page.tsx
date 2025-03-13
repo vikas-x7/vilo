@@ -2,7 +2,14 @@
 "use client";
 
 import { useState, useRef, useEffect, createRef } from "react";
-import { usePortfolioQuery, useSavePortfolio, useDeployPortfolio, useUploadPortfolioImage, PortfolioData } from "@/features/portfolio";
+import {
+  usePortfolioQuery,
+  useSavePortfolio,
+  useDeployPortfolio,
+  useUploadPortfolioImage,
+  PortfolioData,
+  createEmptyPortfolio,
+} from "@/features/portfolio";
 import {
   FiGlobe,
   FiCopy,
@@ -23,60 +30,31 @@ import {
   FiSidebar,
 } from "react-icons/fi";
 
-type Experience = {
-  id: number;
-  role: string;
-  company: string;
-  duration: string;
-  desc: string;
-};
-type Project = { id: number; name: string; desc: string; link: string };
-type Education = { id: number; degree: string; school: string; year: string };
-type Activity = { id: number; name: string; result: string; year: string };
+const defaultData: PortfolioData = createEmptyPortfolio();
 
-const defaultData = {
-  name: "Vikas Pal",
-  username: "vikaspal",
-  avatar: "https://avatars.githubusercontent.com/u/113900393?v=4",
-  description: "Full Stack Developer passionate about building great products.",
-  skills: ["React", "TypeScript", "Node.js", "TailwindCSS"],
-  experience: [
-    {
-      id: 1,
-      role: "Frontend Developer",
-      company: "Acme Corp",
-      duration: "2022 – Present",
-      desc: "Built scalable UI components.",
-    },
-  ] as Experience[],
-  projects: [
-    {
-      id: 1,
-      name: "Portfolio Builder",
-      desc: "A drag-and-drop portfolio tool.",
-      link: "https://github.com",
-    },
-  ] as Project[],
-  education: [
-    {
-      id: 1,
-      degree: "B.Tech Computer Science",
-      school: "ABC University",
-      year: "2018 – 2022",
-    },
-  ] as Education[],
-  activities: [
-    {
-      id: 1,
-      name: "HackTheNorth 2023",
-      result: "Top 10 Finalist",
-      year: "2023",
-    },
-  ] as Activity[],
-  email: "vikas@example.com",
-  github: "github.com/vikaspal",
-  linkedin: "linkedin.com/in/vikaspal",
-};
+function buildPortfolioUrl(username: string, deployedUrl: string) {
+  if (deployedUrl) {
+    return deployedUrl;
+  }
+
+  if (!username) {
+    return "";
+  }
+
+  if (typeof window !== "undefined") {
+    return `${window.location.origin}/${username}`;
+  }
+
+  return `/${username}`;
+}
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return "Something went wrong. Please try again.";
+}
 
 function Editable({
   value,
@@ -91,10 +69,10 @@ function Editable({
   className?: string;
   placeholder?: string;
   multiline?: boolean;
-  tag?: any;
+  tag?: React.ElementType;
 }) {
   const [editing, setEditing] = useState(false);
-  const ref = useRef<any>(null);
+  const ref = useRef<HTMLInputElement | null>(null);
   if (editing) {
     return multiline ? (
       <textarea
@@ -194,60 +172,85 @@ export default function PortfolioPage() {
   const deployMutation = useDeployPortfolio();
   const uploadImageMutation = useUploadPortfolioImage();
 
-  const [data, setData] = useState<PortfolioData>(defaultData as PortfolioData);
-  const [deployedUrl, setDeployedUrl] = useState(`http://localhost:3000/${(defaultData as PortfolioData).username}`);
+  const [data, setData] = useState<PortfolioData>(defaultData);
   const [copied, setCopied] = useState(false);
-  const [deployed, setDeployed] = useState(false);
-  const [isPublic, setIsPublic] = useState(true);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
   const [avatarRef] = useState(() => createRef<HTMLInputElement>());
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusTone, setStatusTone] = useState<"success" | "error" | null>(null);
 
   useEffect(() => {
     if (qData) {
       setData(qData);
-      setDeployedUrl(`http://localhost:3000/${qData.username}`);
     }
   }, [qData]);
 
-  const handleSaveAndDeploy = async () => {
+  const portfolioUrl = buildPortfolioUrl(data.username, data.deployedUrl);
+  const avatarFallback = (data.name.trim()[0] ?? data.username.trim()[0] ?? "U").toUpperCase();
+
+  const handleSave = async () => {
     try {
-      await saveMutation.mutateAsync(data);
-      const res = await deployMutation.mutateAsync();
-      if (res && res.url) {
-        setDeployedUrl(res.url);
-      }
-      setDeployed(true);
-    } catch (e) {
-      console.error("Failed to deploy:", e);
-      alert("Deployment failed. Please try again.");
+      const savedData = await saveMutation.mutateAsync(data);
+      setData(savedData);
+      setStatusTone("success");
+      setStatusMessage("Portfolio changes saved to the database.");
+    } catch (error) {
+      const message = getErrorMessage(error);
+      console.error("Failed to save portfolio:", error);
+      setStatusTone("error");
+      setStatusMessage(message);
+      alert(message);
     }
   };
 
-  const set = (key: keyof typeof defaultData, val: any) =>
+  const handleDeploy = async () => {
+    try {
+      const savedData = await saveMutation.mutateAsync(data);
+      const deployedData = await deployMutation.mutateAsync();
+      setData({
+        ...deployedData,
+        username: deployedData.username || savedData.username,
+      });
+      setStatusTone("success");
+      setStatusMessage(
+        deployedData.isPublic
+          ? "Portfolio deployed and public link is live."
+          : "Portfolio deployed. Switch visibility to public to share it.",
+      );
+    } catch (e) {
+      console.error("Failed to deploy:", e);
+      const message = getErrorMessage(e);
+      setStatusTone("error");
+      setStatusMessage(message);
+      alert(message);
+    }
+  };
+
+  const setField = <K extends keyof PortfolioData>(key: K, val: PortfolioData[K]) =>
     setData((p) => ({ ...p, [key]: val }));
 
   const updateItem = <K extends "experience" | "projects" | "education" | "activities">(
     key: K,
     id: number,
-    patch: Partial<(typeof defaultData)[K][0]>,
+    patch: Partial<PortfolioData[K][number]>,
   ) =>
-    set(
+    setField(
       key,
-      ((data[key] as any[])).map((x) => (x.id === id ? { ...x, ...patch } : x)),
+      data[key].map((x) => (x.id === id ? { ...x, ...patch } : x)) as PortfolioData[K],
     );
 
   const removeItem = <K extends "experience" | "projects" | "education" | "activities">(
     key: K,
     id: number,
   ) =>
-    set(
+    setField(
       key,
-      ((data[key] as any[])).filter((x) => x.id !== id),
+      data[key].filter((x) => x.id !== id) as PortfolioData[K],
     );
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(deployedUrl);
+    navigator.clipboard.writeText(portfolioUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -262,11 +265,16 @@ export default function PortfolioPage() {
       formData.append("file", file);
       const res = await uploadImageMutation.mutateAsync(formData);
       if (res && res.url) {
-        set("avatar", res.url);
+        setField("avatar", res.url);
+        setStatusTone("success");
+        setStatusMessage("Profile image saved to the database.");
       }
     } catch (err) {
       console.error("Failed to upload image:", err);
-      alert("Failed to upload image. Please try again.");
+      const message = getErrorMessage(err);
+      setStatusTone("error");
+      setStatusMessage(message);
+      alert(message);
     } finally {
       setUploadingAvatar(false);
     }
@@ -289,11 +297,19 @@ export default function PortfolioPage() {
             {/* Hero */}
             <div className="flex items-start gap-5 pb-8 border-b border-white/5">
               <div className="relative group shrink-0">
-                <img
-                  src={data.avatar}
-                  alt="avatar"
-                  className={`w-20 h-20 rounded-full border border-white/10 object-cover ${uploadingAvatar ? "opacity-50" : ""}`}
-                />
+                {data.avatar ? (
+                  <img
+                    src={data.avatar}
+                    alt="avatar"
+                    className={`w-20 h-20 rounded-full border border-white/10 object-cover ${uploadingAvatar ? "opacity-50" : ""}`}
+                  />
+                ) : (
+                  <div
+                    className={`w-20 h-20 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-lg text-white/45 ${uploadingAvatar ? "opacity-50" : ""}`}
+                  >
+                    {avatarFallback}
+                  </div>
+                )}
                 {uploadingAvatar && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white/80 rounded-full animate-spin" />
@@ -318,19 +334,19 @@ export default function PortfolioPage() {
                 <Editable
                   tag="h1"
                   value={data.name}
-                  onChange={(v) => set("name", v)}
+                  onChange={(v) => setField("name", v)}
                   className="text-2xl text-white/90 tracking-tight font-medium"
                   placeholder="Your Name"
                 />
                 <Editable
                   value={data.username}
-                  onChange={(v) => set("username", v)}
+                  onChange={(v) => setField("username", v)}
                   className="text-xs text-white/30"
                   placeholder="username"
                 />
                 <Editable
                   value={data.description}
-                  onChange={(v) => set("description", v)}
+                  onChange={(v) => setField("description", v)}
                   className="text-sm text-white/50 leading-relaxed mt-1"
                   placeholder="A short bio..."
                   multiline
@@ -347,13 +363,13 @@ export default function PortfolioPage() {
                     key={i}
                     value={s}
                     onChange={(v) =>
-                      set(
+                      setField(
                         "skills",
                         data.skills.map((x, j) => (j === i ? v : x)),
                       )
                     }
                     onRemove={() =>
-                      set(
+                      setField(
                         "skills",
                         data.skills.filter((_, j) => j !== i),
                       )
@@ -361,7 +377,7 @@ export default function PortfolioPage() {
                   />
                 ))}
                 <button
-                  onClick={() => set("skills", [...data.skills, "New Skill"])}
+                  onClick={() => setField("skills", [...data.skills, "New Skill"])}
                   className="flex items-center gap-1 px-2 py-0.5 text-[10px] border border-dashed border-white/10 text-white/25 rounded-sm hover:border-white/20 hover:text-white/50 transition-all"
                 >
                   <FiPlus size={9} /> Add
@@ -424,7 +440,7 @@ export default function PortfolioPage() {
                 ))}
                 <button
                   onClick={() =>
-                    set("experience", [
+                    setField("experience", [
                       ...data.experience,
                       {
                         id: Date.now(),
@@ -496,7 +512,7 @@ export default function PortfolioPage() {
                 ))}
                 <button
                   onClick={() =>
-                    set("projects", [
+                    setField("projects", [
                       ...data.projects,
                       {
                         id: Date.now(),
@@ -560,7 +576,7 @@ export default function PortfolioPage() {
                 ))}
                 <button
                   onClick={() =>
-                    set("activities", [
+                    setField("activities", [
                       ...data.activities,
                       {
                         id: Date.now(),
@@ -623,7 +639,7 @@ export default function PortfolioPage() {
                 ))}
                 <button
                   onClick={() =>
-                    set("education", [
+                    setField("education", [
                       ...data.education,
                       {
                         id: Date.now(),
@@ -646,19 +662,19 @@ export default function PortfolioPage() {
               <div className="flex flex-wrap gap-4">
                 <Editable
                   value={data.email}
-                  onChange={(v) => set("email", v)}
+                  onChange={(v) => setField("email", v)}
                   className="text-xs text-white/35"
                   placeholder="Email"
                 />
                 <Editable
                   value={data.github}
-                  onChange={(v) => set("github", v)}
+                  onChange={(v) => setField("github", v)}
                   className="text-xs text-white/35"
                   placeholder="GitHub"
                 />
                 <Editable
                   value={data.linkedin}
-                  onChange={(v) => set("linkedin", v)}
+                  onChange={(v) => setField("linkedin", v)}
                   className="text-xs text-white/35"
                   placeholder="LinkedIn"
                 />
@@ -706,10 +722,11 @@ export default function PortfolioPage() {
                   <div className="flex items-center gap-2 bg-white/[0.03] border border-white/5 rounded-sm px-3 py-2">
                     <FiGlobe size={11} className="text-white/20 shrink-0" />
                     <span className="text-[11px] text-white/40 truncate flex-1">
-                      {deployedUrl}
+                      {portfolioUrl || "Save your username to generate a link"}
                     </span>
                     <button
                       onClick={handleCopy}
+                      disabled={!portfolioUrl}
                       className="text-white/15 hover:text-white/50 transition-colors shrink-0"
                     >
                       {copied ? (
@@ -721,16 +738,20 @@ export default function PortfolioPage() {
                   </div>
                   <div className="flex items-center gap-2 px-1">
                     <div
-                      className={`w-1.5 h-1.5 rounded-full shrink-0 ${deployed ? "bg-green-400 animate-pulse" : "bg-white/15"}`}
+                      className={`w-1.5 h-1.5 rounded-full shrink-0 ${data.isDeployed ? "bg-green-400 animate-pulse" : "bg-white/15"}`}
                     />
                     <span
-                      className={`text-[10px] ${deployed ? "text-green-400/70" : "text-white/25"}`}
+                      className={`text-[10px] ${data.isDeployed ? "text-green-400/70" : "text-white/25"}`}
                     >
-                      {deployed ? "Live" : "Not deployed"}
+                      {!data.isDeployed
+                        ? "Not deployed"
+                        : data.isPublic
+                          ? "Live"
+                          : "Private deployment"}
                     </span>
-                    {deployed && (
+                    {data.isDeployed && data.isPublic && portfolioUrl && (
                       <a
-                        href={deployedUrl}
+                        href={portfolioUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="ml-auto flex items-center gap-1 text-[10px] text-white/25 hover:text-white/50 transition-colors"
@@ -745,17 +766,41 @@ export default function PortfolioPage() {
               {/* Publish */}
               <SidebarSection label="Publish">
                 <button
-                  onClick={handleSaveAndDeploy}
+                  onClick={handleSave}
+                  disabled={saveMutation.isPending || deployMutation.isPending}
+                  className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 text-[12px] font-semibold text-white/75 border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] rounded-sm transition-all mb-2 disabled:opacity-50"
+                >
+                  <FiCheck size={12} />
+                  {saveMutation.isPending && !deployMutation.isPending
+                    ? "Saving..."
+                    : "Save Changes"}
+                </button>
+                <button
+                  onClick={handleDeploy}
                   disabled={saveMutation.isPending || deployMutation.isPending}
                   className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 text-[12px] font-semibold text-black/80 bg-[#F0EDE7] hover:bg-white rounded-sm transition-all mb-3 disabled:opacity-50"
                 >
                   <FiZap size={12} />
-                  {saveMutation.isPending || deployMutation.isPending ? "Deploying..." : deployed ? "Re-deploy" : "Deploy"}
+                  {saveMutation.isPending || deployMutation.isPending
+                    ? "Deploying..."
+                    : data.isDeployed
+                      ? "Re-deploy"
+                      : "Deploy"}
                 </button>
-                {deployed && (
+                {statusMessage && (
+                  <div
+                    className={`rounded-sm px-3 py-2.5 mb-3 border text-[11px] leading-relaxed ${statusTone === "error"
+                      ? "bg-red-950/20 border-red-500/10 text-red-300/80"
+                      : "bg-white/[0.03] border-white/5 text-white/45"
+                      }`}
+                  >
+                    {statusMessage}
+                  </div>
+                )}
+                {data.isDeployed && (
                   <div className="bg-green-950/30 border border-green-500/10 rounded-sm px-3 py-2.5 space-y-2">
                     <p className="text-[11px] text-green-400 break-all leading-relaxed">
-                      {deployedUrl}
+                      {portfolioUrl}
                     </p>
                     <button
                       onClick={handleCopy}
@@ -772,8 +817,8 @@ export default function PortfolioPage() {
               <SidebarSection label="Visibility">
                 <div className="flex flex-col gap-2">
                   <button
-                    onClick={() => setIsPublic(true)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-sm text-[12px] transition-all border ${isPublic ? "text-green-400 border-green-500/20 bg-green-950/20" : "text-white/35 border-white/5 hover:border-white/10 hover:text-white/50"}`}
+                    onClick={() => setField("isPublic", true)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-sm text-[12px] transition-all border ${data.isPublic ? "text-green-400 border-green-500/20 bg-green-950/20" : "text-white/35 border-white/5 hover:border-white/10 hover:text-white/50"}`}
                   >
                     <FiEye size={13} />
                     <div className="text-left flex-1">
@@ -782,13 +827,13 @@ export default function PortfolioPage() {
                         Anyone with link
                       </p>
                     </div>
-                    {isPublic && (
+                    {data.isPublic && (
                       <FiCheck size={10} className="text-green-400" />
                     )}
                   </button>
                   <button
-                    onClick={() => setIsPublic(false)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-sm text-[12px] transition-all border ${!isPublic ? "text-amber-400 border-amber-500/20 bg-amber-950/20" : "text-white/35 border-white/5 hover:border-white/10 hover:text-white/50"}`}
+                    onClick={() => setField("isPublic", false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-sm text-[12px] transition-all border ${!data.isPublic ? "text-amber-400 border-amber-500/20 bg-amber-950/20" : "text-white/35 border-white/5 hover:border-white/10 hover:text-white/50"}`}
                   >
                     <FiLock size={13} />
                     <div className="text-left flex-1">
@@ -797,7 +842,7 @@ export default function PortfolioPage() {
                         Only you can see
                       </p>
                     </div>
-                    {!isPublic && (
+                    {!data.isPublic && (
                       <FiCheck size={10} className="text-amber-400" />
                     )}
                   </button>
