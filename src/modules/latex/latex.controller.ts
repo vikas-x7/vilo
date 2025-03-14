@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { latexService } from "./latex.service";
 import { getCurrentUser } from "@/lib/getCurrentUser";
 
+function createErrorResponse(error: unknown, status: number) {
+  if (error instanceof Error) {
+    return NextResponse.json({ message: error.message }, { status });
+  }
+
+  return NextResponse.json({ message: "Internal Server Error" }, { status });
+}
+
 export const latexController = {
   async getAll(req: NextRequest) {
     try {
@@ -12,8 +20,8 @@ export const latexController = {
 
       const docs = await latexService.getAll(user.id);
       return NextResponse.json(docs);
-    } catch (err: any) {
-      return NextResponse.json({ message: err.message }, { status: 400 });
+    } catch (error: unknown) {
+      return createErrorResponse(error, 400);
     }
   },
 
@@ -26,8 +34,8 @@ export const latexController = {
 
       const doc = await latexService.getById(user.id, Number(id));
       return NextResponse.json(doc);
-    } catch (err: any) {
-      return NextResponse.json({ message: err.message }, { status: 404 });
+    } catch (error: unknown) {
+      return createErrorResponse(error, 404);
     }
   },
 
@@ -42,8 +50,8 @@ export const latexController = {
       const doc = await latexService.create(user.id, body.title, body.content);
 
       return NextResponse.json(doc, { status: 201 });
-    } catch (err: any) {
-      return NextResponse.json({ message: err.message }, { status: 400 });
+    } catch (error: unknown) {
+      return createErrorResponse(error, 400);
     }
   },
 
@@ -60,8 +68,8 @@ export const latexController = {
       });
 
       return NextResponse.json(doc);
-    } catch (err: any) {
-      return NextResponse.json({ message: err.message }, { status: 400 });
+    } catch (error: unknown) {
+      return createErrorResponse(error, 400);
     }
   },
 
@@ -80,8 +88,49 @@ export const latexController = {
       );
 
       return NextResponse.json(version);
-    } catch (err: any) {
-      return NextResponse.json({ message: err.message }, { status: 400 });
+    } catch (error: unknown) {
+      return createErrorResponse(error, 400);
+    }
+  },
+
+  async compile(req: NextRequest) {
+    try {
+      const user = await getCurrentUser(req);
+      if (!user) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      }
+
+      const body = await req.json();
+      const result = await latexService.compile(body.content, body.compiler);
+
+      if (result.ok) {
+        return new NextResponse(result.body, {
+          status: result.status,
+          headers: {
+            "Content-Type": result.contentType,
+            "Cache-Control": "no-store",
+          },
+        });
+      }
+
+      return NextResponse.json(result.body, {
+        status: result.status,
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return NextResponse.json(
+          { message: error.message },
+          { status: 400 },
+        );
+      }
+
+      return NextResponse.json(
+        { message: "Compilation failed" },
+        { status: 500 },
+      );
     }
   },
 
@@ -94,8 +143,8 @@ export const latexController = {
 
       await latexService.delete(user.id, Number(id));
       return NextResponse.json({ message: "Deleted successfully" });
-    } catch (err: any) {
-      return NextResponse.json({ message: err.message }, { status: 400 });
+    } catch (error: unknown) {
+      return createErrorResponse(error, 400);
     }
   },
 };

@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { api } from "@/lib/axios";
 import {
   FiSearch,
   FiPlus,
   FiArrowRight,
   FiFileText,
   FiTrash2,
+  FiAlertTriangle,
 } from "react-icons/fi";
 
 const presetTemplates = [
@@ -61,16 +63,88 @@ const presetTemplates = [
   },
 ];
 
-// Mock user documents — replace with real data from API
-const initialUserDocs = [
-  { id: "user-1", name: "My Thesis Draft", updatedAt: "2 hours ago" },
-  { id: "user-2", name: "CV — April 2025", updatedAt: "Yesterday" },
-  { id: "user-3", name: "Conference Paper", updatedAt: "3 days ago" },
-];
+interface LatexVersion {
+  id: number;
+  content: string;
+  createdAt: string;
+}
+
+interface LatexDocument {
+  id: number;
+  title: string;
+  updatedAt: string;
+  versions: LatexVersion[];
+}
+
+function formatUpdatedAt(updatedAt: string) {
+  const date = new Date(updatedAt);
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const hour = 1000 * 60 * 60;
+  const day = hour * 24;
+
+  if (diff < hour) {
+    return "Just now";
+  }
+
+  if (diff < day) {
+    return `${Math.max(1, Math.floor(diff / hour))} hours ago`;
+  }
+
+  if (diff < day * 2) {
+    return "Yesterday";
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+  }).format(date);
+}
 
 export default function LatexPage() {
   const [search, setSearch] = useState("");
-  const [userDocs, setUserDocs] = useState(initialUserDocs);
+  const [userDocs, setUserDocs] = useState<LatexDocument[]>([]);
+  const [docToDelete, setDocToDelete] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+  const [isDocsLoading, setIsDocsLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [docsError, setDocsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadDocs = async () => {
+      try {
+        setIsDocsLoading(true);
+        setDocsError(null);
+        const response = await api.get<LatexDocument[]>("/latex");
+
+        if (!isMounted) {
+          return;
+        }
+
+        setUserDocs(response.data);
+      } catch (error) {
+        console.error("Failed to load latex documents:", error);
+
+        if (isMounted) {
+          setDocsError("Documents load nahi ho paaye. Please refresh and try again.");
+        }
+      } finally {
+        if (isMounted) {
+          setIsDocsLoading(false);
+        }
+      }
+    };
+
+    void loadDocs();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const filteredPresets = presetTemplates.filter(
     (t) =>
@@ -79,41 +153,82 @@ export default function LatexPage() {
   );
 
   const filteredUserDocs = userDocs.filter((d) =>
-    d.name.toLowerCase().includes(search.toLowerCase()),
+    d.title.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const deleteDoc = (id: string) => {
-    setUserDocs((prev) => prev.filter((d) => d.id !== id));
+  const requestDeleteDoc = (id: number, name: string) => {
+    setDocToDelete({ id, name });
   };
 
+  const closeDeleteDialog = () => {
+    setDocToDelete(null);
+  };
+
+  const confirmDeleteDoc = async () => {
+    if (!docToDelete) {
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      await api.delete(`/latex/${docToDelete.id}`);
+      setUserDocs((prev) => prev.filter((d) => d.id !== docToDelete.id));
+      setDocToDelete(null);
+    } catch (error) {
+      console.error("Failed to delete latex document:", error);
+      setDocsError("Document delete nahi hua. Please dobara try karo.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!docToDelete) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setDocToDelete(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [docToDelete]);
+
   return (
-    <div className="px-8 py-6 max-w-7xl mx-auto flex flex-col min-h-full">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-5 border-b border-white/5 mb-6">
-        <div>
-          <h1 className="text-xl tracking-tight text-white/90">
-            LaTeX Templates
-          </h1>
-          <p className="text-[11px] text-white/30 mt-1">
-            Start a new document from a template or create your own from
-            scratch.
-          </p>
+    <>
+      <div className="px-8 py-6 max-w-7xl mx-auto flex flex-col min-h-full">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-5 border-b border-white/5 mb-6">
+          <div>
+            <h1 className="text-xl tracking-tight text-white/90">
+              LaTeX Templates
+            </h1>
+            <p className="text-[11px] text-white/30 mt-1">
+              Start a new document from a template or create your own from
+              scratch.
+            </p>
+          </div>
+          {/* Search */}
+          <div className="relative w-full md:w-64">
+            <FiSearch
+              size={13}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25"
+            />
+            <input
+              type="text"
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-sm pl-8 pr-4 py-2 text-xs text-white/70 placeholder-white/20 outline-none focus:border-white/20 transition-all"
+            />
+          </div>
         </div>
-        {/* Search */}
-        <div className="relative w-full md:w-64">
-          <FiSearch
-            size={13}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25"
-          />
-          <input
-            type="text"
-            placeholder="Search..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-sm pl-8 pr-4 py-2 text-xs text-white/70 placeholder-white/20 outline-none focus:border-white/20 transition-all"
-          />
-        </div>
-      </div>
 
       {/* ── User Documents ── */}
       <section className="mb-8">
@@ -124,7 +239,7 @@ export default function LatexPage() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           {/* Create New */}
           <Link
-            href="/editor"
+            href="/dashboard/latex/editor"
             className="group flex flex-col items-center justify-center bg-white/[0.02] border border-dashed border-white/10 rounded-sm hover:border-white/20 hover:bg-white/5 transition-all duration-300 aspect-[3/4]"
           >
             <div className="w-8 h-8 border border-white/10 rounded-sm flex items-center justify-center text-white/30 group-hover:text-white/60 group-hover:border-white/20 transition-all mb-2">
@@ -136,57 +251,83 @@ export default function LatexPage() {
           </Link>
 
           {/* User doc cards */}
-          {filteredUserDocs.map((doc) => (
-            <div
-              key={doc.id}
-              className="group relative flex flex-col bg-[#1B1913] border border-white/5 rounded-sm overflow-hidden hover:border-white/15 transition-all duration-300 aspect-[3/4]"
-            >
-              {/* Mock paper preview */}
-              <div className="flex-1 flex flex-col items-center justify-center bg-[#0F0E09] p-4 gap-1.5">
-                <FiFileText size={28} className="text-white/15" />
-                <div className="w-full space-y-1.5 mt-2">
-                  {[80, 60, 70, 50, 65].map((w, i) => (
-                    <div
-                      key={i}
-                      className="h-px bg-white/8 rounded-full"
-                      style={{ width: `${w}%` }}
-                    />
-                  ))}
+          {isDocsLoading && (
+            <div className="col-span-full py-10 text-center text-white/25 text-xs">
+              Loading your documents...
+            </div>
+          )}
+
+          {!isDocsLoading && docsError && (
+            <div className="col-span-full py-10 text-center text-red-300/80 text-xs">
+              {docsError}
+            </div>
+          )}
+
+          {!isDocsLoading &&
+            !docsError &&
+            filteredUserDocs.map((doc) => (
+              <div
+                key={doc.id}
+                className="group relative flex flex-col bg-[#1B1913] border border-white/5 rounded-sm overflow-hidden hover:border-white/15 transition-all duration-300 aspect-[3/4]"
+              >
+                {/* Mock paper preview */}
+                <div className="flex-1 flex flex-col items-center justify-center bg-[#0F0E09] p-4 gap-1.5">
+                  <FiFileText size={28} className="text-white/15" />
+                  <div className="w-full space-y-1.5 mt-2">
+                    {[80, 60, 70, 50, 65].map((w, i) => (
+                      <div
+                        key={i}
+                        className="h-px bg-white/8 rounded-full"
+                        style={{ width: `${w}%` }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Info */}
+                <div className="px-3 py-2.5 border-t border-white/5">
+                  <p className="text-xs text-white/70 font-medium truncate">
+                    {doc.title}
+                  </p>
+                  <p className="text-[10px] text-white/25 mt-0.5">
+                    {formatUpdatedAt(doc.updatedAt)}
+                  </p>
+                </div>
+
+                {/* Hover actions */}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center gap-2">
+                  <Link
+                    href={`/dashboard/latex/editor?doc=${doc.id}`}
+                    className="px-3 py-1.5 bg-[#F0EDE7] text-black/80 text-[10px] font-semibold rounded-sm hover:bg-[#F0EDE7]/90 transition-all"
+                  >
+                    Open
+                  </Link>
+                  <button
+                    onClick={() => requestDeleteDoc(doc.id, doc.title)}
+                    className="p-1.5 bg-white/10 border border-white/10 rounded-sm text-white/50 hover:text-red-400 hover:border-red-400/30 transition-all"
+                  >
+                    <FiTrash2 size={12} />
+                  </button>
                 </div>
               </div>
-
-              {/* Info */}
-              <div className="px-3 py-2.5 border-t border-white/5">
-                <p className="text-xs text-white/70 font-medium truncate">
-                  {doc.name}
-                </p>
-                <p className="text-[10px] text-white/25 mt-0.5">
-                  {doc.updatedAt}
-                </p>
-              </div>
-
-              {/* Hover actions */}
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center gap-2">
-                <Link
-                  href={`/dashboard/latex/editor?doc=${doc.id}`}
-                  className="px-3 py-1.5 bg-[#F0EDE7] text-black/80 text-[10px] font-semibold rounded-sm hover:bg-[#F0EDE7]/90 transition-all"
-                >
-                  Open
-                </Link>
-                <button
-                  onClick={() => deleteDoc(doc.id)}
-                  className="p-1.5 bg-white/10 border border-white/10 rounded-sm text-white/50 hover:text-red-400 hover:border-red-400/30 transition-all"
-                >
-                  <FiTrash2 size={12} />
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
 
           {/* Empty state for user docs */}
-          {filteredUserDocs.length === 0 && search && (
+          {!isDocsLoading &&
+            !docsError &&
+            filteredUserDocs.length === 0 &&
+            search && (
             <div className="col-span-full py-6 text-center text-white/20 text-xs">
               No documents match &quot;{search}&quot;
+            </div>
+          )}
+
+          {!isDocsLoading &&
+            !docsError &&
+            userDocs.length === 0 &&
+            !search && (
+            <div className="col-span-full py-10 text-center text-white/20 text-xs">
+              No saved documents yet. Create one and it will show here.
             </div>
           )}
         </div>
@@ -241,6 +382,51 @@ export default function LatexPage() {
           </div>
         )}
       </section>
-    </div>
+      </div>
+
+      {docToDelete && (
+        <div
+          className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"
+          onClick={closeDeleteDialog}
+        >
+          <div
+            className="w-full max-w-md rounded-sm border border-white/10 bg-[#171510] shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="p-5 border-b border-white/5">
+              <div className="w-10 h-10 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-300 mb-4">
+                <FiAlertTriangle size={18} />
+              </div>
+              <h2 className="text-base text-white/90 font-medium">
+                Delete document?
+              </h2>
+              <p className="text-xs text-white/35 leading-relaxed mt-2">
+                <span className="text-white/60">&quot;{docToDelete.name}&quot;</span>{" "}
+                ko permanently remove kar diya jayega. Delete karne se pehle ek
+                baar confirm kar lo.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 p-4">
+              <button
+                type="button"
+                onClick={closeDeleteDialog}
+                className="px-3 py-2 text-xs text-white/55 border border-white/10 rounded-sm hover:text-white/80 hover:border-white/20 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteDoc}
+                disabled={isDeleting}
+                className="px-3 py-2 text-xs font-semibold text-red-100 bg-red-500/15 border border-red-500/25 rounded-sm hover:bg-red-500/20 hover:border-red-500/35 transition-all"
+              >
+                {isDeleting ? "Deleting..." : "Yes, delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

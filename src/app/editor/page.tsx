@@ -1,23 +1,42 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { api } from "@/lib/axios";
 import {
-  BiDownload,
-  BiMinus,
-  BiPlus,
   BiArrowBack,
+  BiDownload,
+  BiLoaderAlt,
+  BiMinus,
   BiPlay,
+  BiPlus,
   BiSave,
 } from "react-icons/bi";
+import { FiAlertCircle, FiFileText } from "react-icons/fi";
 
-function EditorPanel() {
-  const searchParams = useSearchParams();
-  const templateId = searchParams.get("template");
-  const [zoom, setZoom] = useState(80);
+type Compiler =
+  | "pdflatex"
+  | "xelatex"
+  | "lualatex"
+  | "platex"
+  | "uplatex"
+  | "context";
 
-  const [latexCode, setLatexCode] = useState(`\\documentclass{article}
+interface LatexVersion {
+  id: number;
+  content: string;
+  createdAt: string;
+}
+
+interface LatexDocument {
+  id: number;
+  title: string;
+  updatedAt: string;
+  versions: LatexVersion[];
+}
+
+const DEFAULT_LATEX = `\\documentclass{article}
 \\usepackage{graphicx}
 
 \\title{My LaTeX Document}
@@ -31,35 +50,375 @@ function EditorPanel() {
 \\section{Introduction}
 Start writing your document here...
 
-\\end{document}`);
+\\end{document}`;
+
+const TEMPLATE_PRESETS = {
+  "resume-standard": {
+    title: "Professional Resume",
+    content: `\\documentclass[11pt,a4paper]{article}
+\\usepackage[margin=0.7in]{geometry}
+\\begin{document}
+\\section*{John Doe}
+Email: john@example.com
+
+\\section*{Experience}
+Start writing here...
+\\end{document}`,
+  },
+  "research-ieee": {
+    title: "Research Paper",
+    content: `\\documentclass[conference]{IEEEtran}
+\\title{My Research Paper}
+\\author{Author Name}
+\\begin{document}
+\\maketitle
+\\section{Introduction}
+Start writing here...
+\\end{document}`,
+  },
+  "report-tech": {
+    title: "Technical Report",
+    content: `\\documentclass{report}
+\\title{Technical Report}
+\\author{Author Name}
+\\begin{document}
+\\maketitle
+\\chapter{Overview}
+Start writing here...
+\\end{document}`,
+  },
+  "presentation-beamer": {
+    title: "Presentation",
+    content: `\\documentclass{beamer}
+\\title{Slide Deck}
+\\author{Author Name}
+\\begin{document}
+\\frame{\\titlepage}
+\\begin{frame}{Agenda}
+Start writing here...
+\\end{frame}
+\\end{document}`,
+  },
+  "cover-letter": {
+    title: "Cover Letter",
+    content: `\\documentclass{letter}
+\\signature{John Doe}
+\\begin{document}
+\\begin{letter}{Hiring Manager}
+\\opening{Dear Hiring Manager,}
+I am excited to apply...
+\\closing{Sincerely,}
+\\end{letter}
+\\end{document}`,
+  },
+  assignment: {
+    title: "Homework Assignment",
+    content: `\\documentclass{article}
+\\title{Homework Assignment}
+\\author{Student Name}
+\\begin{document}
+\\maketitle
+\\section*{Question 1}
+Write your answer here...
+\\end{document}`,
+  },
+} satisfies Record<string, { title: string; content: string }>;
+
+const compilerOptions: Compiler[] = [
+  "pdflatex",
+  "xelatex",
+  "lualatex",
+  "platex",
+  "uplatex",
+  "context",
+];
+
+type TemplatePresetKey = keyof typeof TEMPLATE_PRESETS;
+
+function getInitialDocument(templateId: string | null) {
+  const preset = templateId
+    ? TEMPLATE_PRESETS[templateId as TemplatePresetKey]
+    : undefined;
+
+  if (preset) {
+    return preset;
+  }
+
+  return {
+    title: "Untitled Document",
+    content: DEFAULT_LATEX,
+  };
+}
+
+function getDisplayError(payload: unknown) {
+  if (payload && typeof payload === "object") {
+    const record = payload as Record<string, unknown>;
+    const message =
+      (typeof record.message === "string" && record.message) ||
+      (typeof record.error === "string" && record.error) ||
+      (typeof record.detail === "string" && record.detail) ||
+      "Compilation failed";
+
+    return {
+      message,
+      logs: JSON.stringify(payload, null, 2),
+    };
+  }
+
+  if (typeof payload === "string" && payload.trim()) {
+    return {
+      message: "Compilation failed",
+      logs: payload,
+    };
+  }
+
+  return {
+    message: "Compilation failed",
+    logs: "",
+  };
+}
+
+function extractSuggestedTitle(content: string, fallback: string) {
+  const titleMatch = content.match(/\\title\{([^}]*)\}/);
+
+  if (titleMatch?.[1]?.trim()) {
+    return titleMatch[1].trim();
+  }
+
+  const firstSectionMatch = content.match(/\\section\*?\{([^}]*)\}/);
+
+  if (firstSectionMatch?.[1]?.trim()) {
+    return firstSectionMatch[1].trim();
+  }
+
+  return fallback.trim() || "Untitled Document";
+}
+
+function buildPreviewSource(previewUrl: string, zoom: number) {
+  return `${previewUrl}#toolbar=0&navpanes=0&zoom=${zoom}`;
+}
+
+function EditorPanel({
+  docId,
+  templateId,
+}: {
+  docId: string | null;
+  templateId: string | null;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const initialDocument = getInitialDocument(templateId);
+  const initialDocumentId =
+    docId && /^\d+$/.test(docId) ? Number(docId) : null;
+
+  const [zoom, setZoom] = useState(80);
+  const [compiler, setCompiler] = useState<Compiler>("pdflatex");
+  const [documentId, setDocumentId] = useState<number | null>(initialDocumentId);
+  const [docTitle, setDocTitle] = useState(initialDocument.title);
+  const [latexCode, setLatexCode] = useState(initialDocument.content);
+  const [isDirty, setIsDirty] = useState(!initialDocumentId);
+  const [isLoadingDoc, setIsLoadingDoc] = useState(Boolean(initialDocumentId));
+  const [isSaving, setIsSaving] = useState(false);
+  const [isCompiling, setIsCompiling] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusTone, setStatusTone] = useState<"success" | "error" | null>(
+    null,
+  );
+  const [compileLogs, setCompileLogs] = useState("");
+  const previousPreviewUrlRef = useRef<string | null>(null);
+  const isBootstrappingRef = useRef(true);
 
   useEffect(() => {
-    if (templateId === "resume-standard") {
-      setLatexCode(`\\documentclass[11pt,a4paper]{article}
-\\begin{document}
-\\section*{John Doe - Resume}
-\\end{document}`);
-    } else if (templateId === "research-ieee") {
-      setLatexCode(`\\documentclass[conference]{IEEEtran}
-\\begin{document}
-\\title{My Research Paper}
-\\maketitle
-\\end{document}`);
-    }
-  }, [templateId]);
+    return () => {
+      if (previousPreviewUrlRef.current) {
+        URL.revokeObjectURL(previousPreviewUrlRef.current);
+      }
+    };
+  }, []);
 
-  const docTitle = templateId
-    ? `New ${templateId.split("-")[0].charAt(0).toUpperCase() + templateId.split("-")[0].slice(1)}`
-    : "Untitled Document";
+  useEffect(() => {
+    if (!documentId) {
+      isBootstrappingRef.current = false;
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadDocument = async () => {
+      try {
+        setIsLoadingDoc(true);
+        const response = await api.get<LatexDocument>(`/latex/${documentId}`);
+
+        if (cancelled) {
+          return;
+        }
+
+        const latestContent = response.data.versions[0]?.content || DEFAULT_LATEX;
+
+        setDocTitle(response.data.title || "Untitled Document");
+        setLatexCode(latestContent);
+        setIsDirty(false);
+        setStatusTone(null);
+        setStatusMessage("");
+        setCompileLogs("");
+      } catch (error) {
+        console.error("Failed to load latex document:", error);
+
+        if (!cancelled) {
+          setStatusTone("error");
+          setStatusMessage("Document load nahi hua. Please dashboard se dobara open karo.");
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingDoc(false);
+          isBootstrappingRef.current = false;
+        }
+      }
+    };
+
+    void loadDocument();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [documentId]);
+
+  const handleTitleChange = (value: string) => {
+    setDocTitle(value);
+
+    if (!isBootstrappingRef.current) {
+      setIsDirty(true);
+    }
+  };
+
+  const handleCodeChange = (value: string) => {
+    setLatexCode(value);
+
+    if (!isBootstrappingRef.current) {
+      setIsDirty(true);
+    }
+  };
+
+  const handleSave = async () => {
+    const resolvedTitle = docTitle.trim() || extractSuggestedTitle(
+      latexCode,
+      initialDocument.title,
+    );
+
+    try {
+      setIsSaving(true);
+
+      if (documentId) {
+        await api.patch(`/latex/${documentId}`, { title: resolvedTitle });
+        await api.put(`/latex/${documentId}`, { content: latexCode });
+      } else {
+        const response = await api.post<LatexDocument>("/latex", {
+          title: resolvedTitle,
+          content: latexCode,
+        });
+
+        setDocumentId(response.data.id);
+        router.replace(`${pathname}?doc=${response.data.id}`);
+      }
+
+      setDocTitle(resolvedTitle);
+      setIsDirty(false);
+      setStatusTone("success");
+      setStatusMessage("Document saved successfully.");
+    } catch (error) {
+      console.error("Failed to save latex document:", error);
+      setStatusTone("error");
+      setStatusMessage("Document save nahi hua. Please dobara try karo.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCompile = async () => {
+    try {
+      setIsCompiling(true);
+      setStatusTone(null);
+      setStatusMessage("");
+      setCompileLogs("");
+
+      const userId =
+        typeof window !== "undefined" ? localStorage.getItem("user_id") : null;
+
+      const response = await fetch("/api/latex/compile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(userId ? { "x-user-id": userId } : {}),
+        },
+        body: JSON.stringify({
+          content: latexCode,
+          compiler,
+        }),
+      });
+
+      const contentType = response.headers.get("content-type") || "";
+
+      if (contentType.includes("application/pdf")) {
+        const pdfBlob = await response.blob();
+        const nextPreviewUrl = URL.createObjectURL(pdfBlob);
+
+        if (previousPreviewUrlRef.current) {
+          URL.revokeObjectURL(previousPreviewUrlRef.current);
+        }
+
+        previousPreviewUrlRef.current = nextPreviewUrl;
+        setPreviewUrl(nextPreviewUrl);
+        setStatusTone("success");
+        setStatusMessage("Compilation complete. PDF preview ready.");
+        return;
+      }
+
+      const rawPayload = await response.text();
+      let parsedPayload: unknown = rawPayload;
+
+      try {
+        parsedPayload = JSON.parse(rawPayload);
+      } catch {
+        // keep raw text if response is not json
+      }
+
+      const errorState = getDisplayError(parsedPayload);
+      setPreviewUrl(null);
+      setStatusTone("error");
+      setStatusMessage(errorState.message);
+      setCompileLogs(errorState.logs);
+    } catch (error) {
+      console.error("Failed to compile latex document:", error);
+      setPreviewUrl(null);
+      setStatusTone("error");
+      setStatusMessage(
+        "Compilation service tak request nahi gayi. Network/config once check kar lo.",
+      );
+      setCompileLogs(error instanceof Error ? error.message : "");
+    } finally {
+      setIsCompiling(false);
+    }
+  };
+
+  const handleDownload = () => {
+    if (!previewUrl) {
+      return;
+    }
+
+    const anchor = document.createElement("a");
+    anchor.href = previewUrl;
+    anchor.download = `${(docTitle || "document").replace(/\s+/g, "-").toLowerCase()}.pdf`;
+    anchor.click();
+  };
 
   const lineCount = Math.max(80, latexCode.split("\n").length + 10);
+  const previewSrc = previewUrl ? buildPreviewSource(previewUrl, zoom) : null;
 
   return (
     <div className="flex flex-col h-screen bg-[#0F0E09] font-gothic overflow-hidden text-white">
-      {/* ── Single Top Bar ── */}
-      <div className="flex items-center justify-between px-4 bg-[#1B1913] border-b border-white/5 shrink-0 h-11">
-        {/* Left — back + title */}
-        <div className="flex items-center gap-3 flex-1">
+      <div className="flex items-center justify-between px-4 bg-[#1B1913] border-b border-white/5 shrink-0 h-11 gap-4">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <Link
             href="/dashboard/latex"
             className="p-1.5 hover:bg-white/5 rounded-sm text-white/30 hover:text-white/70 transition-colors"
@@ -67,16 +426,26 @@ Start writing your document here...
             <BiArrowBack size={15} />
           </Link>
           <div className="h-3.5 w-px bg-white/8" />
-          <p className="text-[13px] text-white/60">{docTitle}</p>
-          <span className="text-[10px] text-white/20 border border-white/8 px-1.5 py-0.5 rounded-sm">
-            unsaved
+          <input
+            value={docTitle}
+            onChange={(event) => handleTitleChange(event.target.value)}
+            placeholder="Untitled Document"
+            className="bg-transparent text-[13px] text-white/60 min-w-0 flex-1 outline-none border-b border-transparent focus:border-white/20 pb-0.5"
+          />
+          <span className="text-[10px] text-white/20 border border-white/8 px-1.5 py-0.5 rounded-sm shrink-0">
+            {isLoadingDoc
+              ? "loading"
+              : isSaving
+                ? "saving"
+                : isDirty
+                  ? "unsaved"
+                  : "saved"}
           </span>
         </div>
 
-        {/* Center — zoom controls (preview side) */}
         <div className="flex items-center gap-1 flex-1 justify-center">
           <button
-            onClick={() => setZoom((z) => Math.max(40, z - 10))}
+            onClick={() => setZoom((value) => Math.max(40, value - 10))}
             className="p-1.5 hover:bg-white/5 rounded-sm text-white/25 hover:text-white/60 transition-colors"
           >
             <BiMinus size={12} />
@@ -85,40 +454,83 @@ Start writing your document here...
             {zoom}%
           </span>
           <button
-            onClick={() => setZoom((z) => Math.min(200, z + 10))}
+            onClick={() => setZoom((value) => Math.min(200, value + 10))}
             className="p-1.5 hover:bg-white/5 rounded-sm text-white/25 hover:text-white/60 transition-colors"
           >
             <BiPlus size={12} />
           </button>
           <div className="h-3 w-px bg-white/10 mx-2" />
+          <select
+            value={compiler}
+            onChange={(event) => setCompiler(event.target.value as Compiler)}
+            className="bg-white/5 border border-white/10 rounded-sm px-2 py-1 text-[11px] text-white/55 outline-none focus:border-white/20"
+          >
+            {compilerOptions.map((option) => (
+              <option key={option} value={option} className="bg-[#1B1913]">
+                {option}
+              </option>
+            ))}
+          </select>
+          <div className="h-3 w-px bg-white/10 mx-2" />
           <button
-            className="p-1.5 hover:bg-white/5 rounded-sm text-white/25 hover:text-white/60 transition-colors"
+            onClick={handleDownload}
+            disabled={!previewUrl}
+            className="p-1.5 hover:bg-white/5 rounded-sm text-white/25 hover:text-white/60 transition-colors disabled:opacity-40"
             title="Download PDF"
           >
             <BiDownload size={13} />
           </button>
         </div>
 
-        {/* Right — save + compile */}
         <div className="flex items-center gap-2 flex-1 justify-end">
-          <button className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] text-white/45 bg-white/5 border border-white/8 hover:border-white/20 hover:text-white/80 rounded-sm transition-all outline-none">
-            <BiSave size={13} /> Save
+          <button
+            onClick={handleSave}
+            disabled={isSaving || isLoadingDoc}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] text-white/45 bg-white/5 border border-white/8 hover:border-white/20 hover:text-white/80 rounded-sm transition-all outline-none disabled:opacity-50"
+          >
+            {isSaving ? (
+              <BiLoaderAlt size={13} className="animate-spin" />
+            ) : (
+              <BiSave size={13} />
+            )}
+            Save
           </button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-black/80 bg-[#F0EDE7] hover:bg-white rounded-sm transition-all outline-none">
-            <BiPlay size={13} /> Compile
+          <button
+            onClick={handleCompile}
+            disabled={isCompiling || isLoadingDoc}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-black/80 bg-[#F0EDE7] hover:bg-white rounded-sm transition-all outline-none disabled:opacity-60"
+          >
+            {isCompiling ? (
+              <BiLoaderAlt size={13} className="animate-spin" />
+            ) : (
+              <BiPlay size={13} />
+            )}
+            {isCompiling ? "Compiling..." : "Compile"}
           </button>
         </div>
       </div>
 
-      {/* ── Editor + Preview ── */}
+      {(statusMessage || compileLogs) && (
+        <div
+          className={`px-4 py-2 border-b text-[11px] ${
+            statusTone === "error"
+              ? "bg-red-950/20 border-red-500/10 text-red-200/80"
+              : "bg-white/[0.02] border-white/5 text-white/45"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {statusTone === "error" && <FiAlertCircle size={12} />}
+            <span>{statusMessage}</span>
+          </div>
+        </div>
+      )}
+
       <div className="flex-1 flex min-h-0">
-        {/* LEFT — Code Editor */}
         <div
           className="flex-1 flex min-w-0 overflow-hidden border-r border-white/5"
           style={{ maxWidth: "50%" }}
         >
           <div className="relative w-full bg-[#0C0B08] overflow-hidden flex">
-            {/* Line numbers */}
             <div
               className="shrink-0 w-11 flex flex-col items-end py-5 pr-3 text-[12px] font-mono select-none pointer-events-none overflow-hidden"
               style={{
@@ -128,9 +540,9 @@ Start writing your document here...
                 lineHeight: "1.6rem",
               }}
             >
-              {Array.from({ length: lineCount }).map((_, i) => (
+              {Array.from({ length: lineCount }).map((_, index) => (
                 <div
-                  key={i}
+                  key={index}
                   style={{
                     height: "1.6rem",
                     display: "flex",
@@ -138,12 +550,11 @@ Start writing your document here...
                     justifyContent: "flex-end",
                   }}
                 >
-                  {i + 1}
+                  {index + 1}
                 </div>
               ))}
             </div>
 
-            {/* Textarea */}
             <textarea
               className="flex-1 resize-none outline-none bg-transparent text-white/60 font-mono py-5 px-4 overflow-auto"
               style={{
@@ -152,216 +563,74 @@ Start writing your document here...
                 caretColor: "rgba(255,255,255,0.6)",
               }}
               value={latexCode}
-              onChange={(e) => setLatexCode(e.target.value)}
-              spellCheck="false"
+              onChange={(event) => handleCodeChange(event.target.value)}
+              spellCheck={false}
             />
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="w-px bg-white/5 shrink-0 flex flex-col items-center justify-center relative">
-          <div className="absolute flex flex-col gap-1">
-            <div className="w-4 h-4 bg-[#1B1913] border border-white/8 rounded-full flex items-center justify-center text-white/20 cursor-pointer hover:text-white/50 transition-colors text-[7px]">
-              ◀
-            </div>
-            <div className="w-4 h-4 bg-[#1B1913] border border-white/8 rounded-full flex items-center justify-center text-white/20 cursor-pointer hover:text-white/50 transition-colors text-[7px]">
-              ▶
-            </div>
-          </div>
-        </div>
+        <div className="w-px bg-white/5 shrink-0" />
 
-        {/* RIGHT — PDF Preview */}
         <div
           className="flex-1 flex flex-col min-w-0"
           style={{ maxWidth: "50%" }}
         >
-          <div className="flex-1 bg-[#1a1a1a] overflow-auto flex justify-center items-start py-6 px-4">
-            <div
-              style={{
-                width: "595px",
-                minHeight: "842px",
-                transform: `scale(${zoom / 100})`,
-                transformOrigin: "top center",
-                flexShrink: 0,
-                marginBottom: `${(zoom / 100 - 1) * 842}px`,
-              }}
-              className="bg-white shadow-[0_4px_40px_rgba(0,0,0,0.8)]"
-            >
-              <div className="px-12 py-10 font-serif text-black leading-relaxed space-y-4">
-                {/* Name + Contact */}
-                <div className="text-center pb-3 border-b border-black/15">
-                  <h1 className="text-[22px] font-bold tracking-wide">
-                    Vikas Pal
-                  </h1>
-                  <p className="text-[11px] text-black/50 mt-1.5">
-                    vikaspal9131 &nbsp;|&nbsp; vikaspal &nbsp;|&nbsp; Portfolio
-                    &nbsp;|&nbsp; vikaspal.icu@gmail.com &nbsp;|&nbsp; +91
-                    9131953741
-                  </p>
-                </div>
-
-                {/* Education */}
-                <div>
-                  <h2 className="text-[12px] font-bold uppercase tracking-widest border-b border-black/20 pb-1 mb-2">
-                    Education
-                  </h2>
-                  <div className="flex justify-between items-start">
+          <div className="flex-1 bg-[#1a1a1a] overflow-auto px-4 py-6">
+            {isLoadingDoc ? (
+              <div className="h-full flex items-center justify-center text-white/30 text-sm">
+                <BiLoaderAlt size={18} className="animate-spin mr-2" />
+                Loading document...
+              </div>
+            ) : previewSrc ? (
+              <div className="h-full flex justify-center items-start">
+                <iframe
+                  title="Compiled PDF preview"
+                  src={previewSrc}
+                  className="w-full h-full min-h-[840px] bg-white shadow-[0_4px_40px_rgba(0,0,0,0.8)] rounded-sm"
+                />
+              </div>
+            ) : (
+              <div className="h-full flex items-center justify-center">
+                <div className="w-full max-w-xl min-h-[480px] bg-[#11100c] border border-white/5 rounded-sm p-6 text-left">
+                  <div className="flex items-center gap-3 text-white/65 mb-4">
+                    <div className="w-10 h-10 rounded-sm bg-white/[0.04] border border-white/8 flex items-center justify-center">
+                      <FiFileText size={18} />
+                    </div>
                     <div>
-                      <p className="font-bold text-[13px]">
-                        Chameli Devi Group of Institution
-                      </p>
-                      <p className="text-[12px] text-black/70">
-                        Bachelor of Technology in Computer Science and
-                        Information Technology
+                      <p className="text-sm text-white/80">PDF Preview</p>
+                      <p className="text-[11px] text-white/30">
+                        Compile dabate hi LaTeX-on-HTTP se generated PDF yahan show hoga.
                       </p>
                     </div>
-                    <div className="text-right text-[12px] text-black/60 shrink-0 ml-6">
-                      <p>Indore, India</p>
-                      <p>2022 – 2026</p>
+                  </div>
+
+                  {compileLogs ? (
+                    <pre className="text-[11px] leading-relaxed whitespace-pre-wrap break-words text-red-200/80 bg-black/20 border border-red-500/10 rounded-sm p-4 overflow-auto max-h-[420px]">
+                      {compileLogs}
+                    </pre>
+                  ) : (
+                    <div className="h-[360px] border border-dashed border-white/10 rounded-sm flex items-center justify-center text-center text-white/20 text-xs px-6">
+                      Current document ka live PDF preview dekhne ke liye
+                      `Compile` button use karo.
                     </div>
-                  </div>
-                </div>
-
-                {/* Work Experience */}
-                <div>
-                  <h2 className="text-[12px] font-bold uppercase tracking-widest border-b border-black/20 pb-1 mb-2">
-                    Work Experience
-                  </h2>
-                  <div className="space-y-4">
-                    {[
-                      {
-                        role: "Full Stack Developer",
-                        company: "Krip AI",
-                        period: "Jun 2025 – Sep 2025",
-                        location: "Remote",
-                        points: [
-                          "Improved application reliability by fixing 13+ frontend bugs and UI issues, enhancing cross-browser compatibility and user experience.",
-                          "Enhanced a production-ready frontend with React.js and Tailwind CSS, improving performance and delivering a smoother, user-friendly experience.",
-                          "Contributed to backend improvements by optimizing data delivery and reducing response time of two APIs by 20% for faster performance.",
-                        ],
-                      },
-                      {
-                        role: "Backend AI Engineer Intern",
-                        company: "IlegalAdvice",
-                        period: "Feb 2025 – May 2025",
-                        location: "Remote",
-                        points: [
-                          "Developed an AI-driven case summarization feature leveraging LLMs, able to process 600+ page PDFs and cut legal review time by 60%, improving overall efficiency.",
-                          "Implemented an AI legal dictionary using LLMs to identify and explain complex legal terms with contextual clarity.",
-                          "Handled feature enhancements and resolved 20+ bugs, improving platform performance and making the codebase more stable.",
-                        ],
-                      },
-                    ].map((exp, i) => (
-                      <div key={i}>
-                        <div className="flex justify-between items-baseline">
-                          <p className="font-bold text-[13px]">{exp.role}</p>
-                          <p className="text-[11px] text-black/50">
-                            {exp.period}
-                          </p>
-                        </div>
-                        <div className="flex justify-between mb-1">
-                          <p className="font-bold text-[12px]">{exp.company}</p>
-                          <p className="text-[11px] text-black/50">
-                            {exp.location}
-                          </p>
-                        </div>
-                        <ul className="list-disc ml-5 space-y-1">
-                          {exp.points.map((pt, j) => (
-                            <li
-                              key={j}
-                              className="text-[11.5px] text-black/75 leading-snug"
-                            >
-                              {pt}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Projects */}
-                <div>
-                  <h2 className="text-[12px] font-bold uppercase tracking-widest border-b border-black/20 pb-1 mb-2">
-                    Projects
-                  </h2>
-                  <div className="space-y-4">
-                    {[
-                      {
-                        name: "SnappyGit",
-                        tech: "Express.js, Node.js, Firebase, JavaScript",
-                        points: [
-                          "Built a robust platform to make GitHub profiles look active, professional, and engaging in under 1 minute.",
-                          "Enabled users to push up to 10 past commits per day with a single click, creating a realistic GitHub history.",
-                          "Gained 60+ Peerlist upvotes, 1.1K+ Twitter impressions, and 100+ real users with strong engagement.",
-                          "Integrated Google and GitHub authentication, supporting 1,000+ users with secure and easy access.",
-                        ],
-                      },
-                      {
-                        name: "Nexora",
-                        tech: "Python, Flask, TailwindCSS, Firebase, JavaScript",
-                        points: [
-                          "Developed an AI-powered resume analysis web application using Flask, boosting ATS compatibility by 85% and improving keyword optimization by 60%.",
-                          "System capable of handling 200+ concurrent users, delivering resume analysis results in under 10 seconds.",
-                        ],
-                      },
-                    ].map((proj, i) => (
-                      <div key={i}>
-                        <div className="flex justify-between items-baseline mb-1">
-                          <p className="font-bold text-[12.5px]">
-                            {proj.name} —{" "}
-                            <span className="font-normal">{proj.tech}</span>
-                          </p>
-                          <p className="text-[11px] text-blue-600 shrink-0 ml-4">
-                            Website | Code
-                          </p>
-                        </div>
-                        <ul className="list-disc ml-5 space-y-1">
-                          {proj.points.map((pt, j) => (
-                            <li
-                              key={j}
-                              className="text-[11.5px] text-black/75 leading-snug"
-                            >
-                              {pt}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Skills */}
-                <div>
-                  <h2 className="text-[12px] font-bold uppercase tracking-widest border-b border-black/20 pb-1 mb-2">
-                    Skills
-                  </h2>
-                  <div className="space-y-1 text-[12px] text-black/75">
-                    <p>
-                      <span className="font-bold">Languages:</span> JavaScript,
-                      TypeScript, Python, C++, SQL
-                    </p>
-                    <p>
-                      <span className="font-bold">Frameworks:</span> React.js,
-                      Next.js, Node.js, Express.js, Flask, TailwindCSS
-                    </p>
-                    <p>
-                      <span className="font-bold">Tools:</span> Git, Docker,
-                      Firebase, PostgreSQL, MongoDB, Redis
-                    </p>
-                    <p>
-                      <span className="font-bold">Concepts:</span> REST APIs,
-                      LLMs, System Design, CI/CD, Agile
-                    </p>
-                  </div>
+                  )}
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+function EditorLoader() {
+  const searchParams = useSearchParams();
+  const docId = searchParams.get("doc");
+  const templateId = searchParams.get("template");
+  const editorKey = `${docId || "new"}:${templateId || "blank"}`;
+
+  return <EditorPanel key={editorKey} docId={docId} templateId={templateId} />;
 }
 
 export default function LatexEditorPage() {
@@ -373,7 +642,7 @@ export default function LatexEditorPage() {
         </div>
       }
     >
-      <EditorPanel />
+      <EditorLoader />
     </Suspense>
   );
 }
