@@ -8,12 +8,10 @@ import { authService } from "@/services/auth.service";
 import { GiRoundShield } from "react-icons/gi";
 import { BsLayoutSidebarReverse } from "react-icons/bs";
 import {
+  FiBriefcase,
   FiFileText,
   FiMap,
   FiUser,
-  FiMail,
-  FiBell,
-  FiLogOut,
   FiSettings,
 } from "react-icons/fi";
 import { CiGlobe } from "react-icons/ci";
@@ -21,6 +19,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const navItems = [
   { href: "/dashboard/latex", label: "LaTeX", icon: FiFileText },
+  { href: "/dashboard/jobs", label: "Jobs", icon: FiBriefcase },
   {
     href: "/dashboard/portfolio",
     label: "Portfolio",

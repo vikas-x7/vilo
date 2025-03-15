@@ -14,6 +14,7 @@ model User {
   password         String
   latexDocs        Latex[]
   portfolio        Portfolio?
+  jobBookmarks     JobBookmark[]
   roadmapBookmarks RoadmapBookmark[]
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
@@ -69,4 +70,26 @@ model RoadmapBookmark {
   roadmap Roadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
 
   @@unique([userId, roadmapId])
+}
+
+model JobBookmark {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  source      String
+  externalId  String
+  slug        String
+  title       String
+  companyName String
+  location    String
+  applyUrl    String
+  remote      Boolean  @default(false)
+  tags        Json
+  jobTypes    Json
+  snippet     String?
+  postedAt    DateTime?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, source, externalId])
 }
