@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { latexService } from "./latex.service";
 import { getCurrentUser } from "@/lib/getCurrentUser";
+import { latexAssistantRequestSchema } from "./latex.validator";
 
 function createErrorResponse(error: unknown, status: number) {
   if (error instanceof Error) {
@@ -131,6 +132,23 @@ export const latexController = {
         { message: "Compilation failed" },
         { status: 500 },
       );
+    }
+  },
+
+  async assistant(req: NextRequest) {
+    try {
+      const user = await getCurrentUser(req);
+      if (!user) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      }
+
+      const body = await req.json();
+      const parsed = latexAssistantRequestSchema.parse(body);
+      const result = await latexService.assist(parsed);
+
+      return NextResponse.json(result);
+    } catch (error: unknown) {
+      return createErrorResponse(error, 400);
     }
   },
 

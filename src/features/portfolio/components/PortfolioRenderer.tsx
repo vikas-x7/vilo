@@ -9,7 +9,11 @@ interface Props {
 }
 
 export default function PortfolioRenderer({ data }: Props) {
-  const avatarFallback = (data.name.trim()[0] ?? data.username.trim()[0] ?? "U").toUpperCase();
+  const avatarFallback = (
+    data.name.trim()[0] ??
+    data.username.trim()[0] ??
+    "U"
+  ).toUpperCase();
 
   return (
     <div className="flex flex-col min-h-screen bg-[#14120B]  font-gothic text-white">
@@ -60,16 +64,18 @@ export default function PortfolioRenderer({ data }: Props) {
             <div className="space-y-5">
               {data.experience.map((e) => (
                 <div key={e.id} className="border-l border-white/10 pl-4">
-                  <div className="flex items-baseline gap-2 flex-wrap">
+                  <div className="flex items-baseline gap-2 flex-wrap justify-between">
                     <p className="text-sm text-white/80 font-medium">
                       {e.role}
                     </p>
-                    <span className="text-white/20 text-xs">@</span>
+                    <p className="text-[11px] text-white/25 mt-0.5">
+                      {e.duration}
+                    </p>
+                  </div>
+                  <div className="flex items-center">
                     <p className="text-sm text-white/50">{e.company}</p>
                   </div>
-                  <p className="text-[11px] text-white/25 mt-0.5">
-                    {e.duration}
-                  </p>
+
                   <p className="text-xs text-white/40 mt-1.5 leading-relaxed">
                     {e.desc}
                   </p>

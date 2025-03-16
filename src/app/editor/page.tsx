@@ -3,7 +3,11 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Editor, { loader, type BeforeMount } from "@monaco-editor/react";
 import { api } from "@/lib/axios";
+import { Sparkles, WandSparkles, X } from "lucide-react";
+import * as monacoEditor from "monaco-editor";
+import { latexTemplatePresets } from "@/modules/latex/latex.templates";
 import {
   BiArrowBack,
   BiDownload,
@@ -36,6 +40,19 @@ interface LatexDocument {
   versions: LatexVersion[];
 }
 
+type LatexAssistantAction = "generate" | "fix";
+
+interface LatexAssistantResponse {
+  action: LatexAssistantAction;
+  title: string;
+  latexCode: string;
+  summary: string;
+  nextSteps: string[];
+  model: string;
+}
+
+loader.config({ monaco: monacoEditor });
+
 const DEFAULT_LATEX = `\\documentclass{article}
 \\usepackage{graphicx}
 
@@ -52,78 +69,6 @@ Start writing your document here...
 
 \\end{document}`;
 
-const TEMPLATE_PRESETS = {
-  "resume-standard": {
-    title: "Professional Resume",
-    content: `\\documentclass[11pt,a4paper]{article}
-\\usepackage[margin=0.7in]{geometry}
-\\begin{document}
-\\section*{John Doe}
-Email: john@example.com
-
-\\section*{Experience}
-Start writing here...
-\\end{document}`,
-  },
-  "research-ieee": {
-    title: "Research Paper",
-    content: `\\documentclass[conference]{IEEEtran}
-\\title{My Research Paper}
-\\author{Author Name}
-\\begin{document}
-\\maketitle
-\\section{Introduction}
-Start writing here...
-\\end{document}`,
-  },
-  "report-tech": {
-    title: "Technical Report",
-    content: `\\documentclass{report}
-\\title{Technical Report}
-\\author{Author Name}
-\\begin{document}
-\\maketitle
-\\chapter{Overview}
-Start writing here...
-\\end{document}`,
-  },
-  "presentation-beamer": {
-    title: "Presentation",
-    content: `\\documentclass{beamer}
-\\title{Slide Deck}
-\\author{Author Name}
-\\begin{document}
-\\frame{\\titlepage}
-\\begin{frame}{Agenda}
-Start writing here...
-\\end{frame}
-\\end{document}`,
-  },
-  "cover-letter": {
-    title: "Cover Letter",
-    content: `\\documentclass{letter}
-\\signature{John Doe}
-\\begin{document}
-\\begin{letter}{Hiring Manager}
-\\opening{Dear Hiring Manager,}
-I am excited to apply...
-\\closing{Sincerely,}
-\\end{letter}
-\\end{document}`,
-  },
-  assignment: {
-    title: "Homework Assignment",
-    content: `\\documentclass{article}
-\\title{Homework Assignment}
-\\author{Student Name}
-\\begin{document}
-\\maketitle
-\\section*{Question 1}
-Write your answer here...
-\\end{document}`,
-  },
-} satisfies Record<string, { title: string; content: string }>;
-
 const compilerOptions: Compiler[] = [
   "pdflatex",
   "xelatex",
@@ -133,12 +78,8 @@ const compilerOptions: Compiler[] = [
   "context",
 ];
 
-type TemplatePresetKey = keyof typeof TEMPLATE_PRESETS;
-
 function getInitialDocument(templateId: string | null) {
-  const preset = templateId
-    ? TEMPLATE_PRESETS[templateId as TemplatePresetKey]
-    : undefined;
+  const preset = templateId ? latexTemplatePresets[templateId] : undefined;
 
   if (preset) {
     return preset;
@@ -198,6 +139,101 @@ function buildPreviewSource(previewUrl: string, zoom: number) {
   return `${previewUrl}#toolbar=0&navpanes=0&zoom=${zoom}`;
 }
 
+function getApiErrorMessage(error: unknown) {
+  if (error && typeof error === "object") {
+    const responseData = (error as { response?: { data?: unknown } }).response
+      ?.data;
+
+    if (responseData && typeof responseData === "object") {
+      const record = responseData as Record<string, unknown>;
+      if (typeof record.message === "string" && record.message.trim()) {
+        return record.message;
+      }
+
+      if (typeof record.error === "string" && record.error.trim()) {
+        return record.error;
+      }
+    }
+
+    if ("message" in error && typeof error.message === "string") {
+      return error.message;
+    }
+  }
+
+  return "The AI request could not be completed. Please try again.";
+}
+
+const configureLatexEditor: BeforeMount = (monaco) => {
+  if (
+    !monaco.languages
+      .getLanguages()
+      .some((language: { id: string }) => language.id === "latex")
+  ) {
+    monaco.languages.register({ id: "latex" });
+
+    monaco.languages.setMonarchTokensProvider("latex", {
+      tokenizer: {
+        root: [
+          [/%.*$/, "comment"],
+          [/\\[a-zA-Z@]+/, "keyword"],
+          [/\$(?:\\.|[^$\\])+\$/, "string"],
+          [/[{}[\]()]/, "@brackets"],
+          [/\b\d+(\.\d+)?\b/, "number"],
+          [/[&_^~]/, "operator"],
+          [/[^\\%{}[\]$&_^~]+/, "identifier"],
+        ],
+      },
+    });
+
+    monaco.languages.setLanguageConfiguration("latex", {
+      comments: { lineComment: "%" },
+      brackets: [
+        ["{", "}"],
+        ["[", "]"],
+        ["(", ")"],
+      ],
+      autoClosingPairs: [
+        { open: "{", close: "}" },
+        { open: "[", close: "]" },
+        { open: "(", close: ")" },
+        { open: "$", close: "$" },
+      ],
+      surroundingPairs: [
+        { open: "{", close: "}" },
+        { open: "[", close: "]" },
+        { open: "(", close: ")" },
+        { open: "$", close: "$" },
+      ],
+    });
+  }
+
+  monaco.editor.defineTheme("vilo-monaco", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [
+      { token: "comment", foreground: "6A9955" },
+      { token: "keyword", foreground: "C586C0" },
+      { token: "string", foreground: "CE9178" },
+      { token: "number", foreground: "B5CEA8" },
+      { token: "operator", foreground: "D4D4D4" },
+      { token: "identifier", foreground: "D4D4D4" },
+    ],
+    colors: {
+      "editor.background": "#0C0B08",
+      "editor.foreground": "#D4D4D4",
+      "editorLineNumber.foreground": "#5B554B",
+      "editorLineNumber.activeForeground": "#C8C1B7",
+      "editor.lineHighlightBackground": "#17130F",
+      "editor.selectionBackground": "#264F78",
+      "editor.inactiveSelectionBackground": "#3A3D41",
+      "editorCursor.foreground": "#F4EFE7",
+      "editorIndentGuide.background1": "#201C16",
+      "editorIndentGuide.activeBackground1": "#413A2E",
+      "editorGutter.background": "#0C0B08",
+    },
+  });
+};
+
 function EditorPanel({
   docId,
   templateId,
@@ -226,8 +262,22 @@ function EditorPanel({
     null,
   );
   const [compileLogs, setCompileLogs] = useState("");
+  const [isAiPanelOpen, setIsAiPanelOpen] = useState(true);
+  const [assistantPrompt, setAssistantPrompt] = useState("");
+  const [isAiWorking, setIsAiWorking] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [aiResult, setAiResult] = useState<LatexAssistantResponse | null>(null);
   const previousPreviewUrlRef = useRef<string | null>(null);
   const isBootstrappingRef = useRef(true);
+
+  const clearPreview = () => {
+    if (previousPreviewUrlRef.current) {
+      URL.revokeObjectURL(previousPreviewUrlRef.current);
+      previousPreviewUrlRef.current = null;
+    }
+
+    setPreviewUrl(null);
+  };
 
   useEffect(() => {
     return () => {
@@ -262,12 +312,16 @@ function EditorPanel({
         setStatusTone(null);
         setStatusMessage("");
         setCompileLogs("");
+        setAiError(null);
+        setAiResult(null);
       } catch (error) {
         console.error("Failed to load latex document:", error);
 
         if (!cancelled) {
           setStatusTone("error");
-          setStatusMessage("Document load nahi hua. Please dashboard se dobara open karo.");
+          setStatusMessage(
+            "The document could not be loaded. Please reopen it from the dashboard.",
+          );
         }
       } finally {
         if (!cancelled) {
@@ -329,9 +383,79 @@ function EditorPanel({
     } catch (error) {
       console.error("Failed to save latex document:", error);
       setStatusTone("error");
-      setStatusMessage("Document save nahi hua. Please dobara try karo.");
+      setStatusMessage("The document could not be saved. Please try again.");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const applyAssistantResult = (result: LatexAssistantResponse) => {
+    const nextTitle =
+      result.action === "fix"
+        ? docTitle.trim() || result.title
+        : result.title.trim() || docTitle.trim() || "Untitled Document";
+
+    setDocTitle(nextTitle);
+    setLatexCode(result.latexCode);
+    setIsDirty(true);
+    setAiError(null);
+    setAiResult(result);
+    clearPreview();
+    setCompileLogs("");
+    setStatusTone("success");
+    setStatusMessage(
+      result.action === "fix"
+        ? "The AI updated the code. Compile it again to verify the fix."
+        : "The AI generated a new LaTeX document and inserted it into the editor.",
+    );
+  };
+
+  const runAssistant = async (action: LatexAssistantAction) => {
+    if (action === "generate" && !assistantPrompt.trim()) {
+      setAiError("Describe the kind of LaTeX document you want first.");
+      setIsAiPanelOpen(true);
+      return;
+    }
+
+    if (action === "fix" && !compileLogs.trim()) {
+      setAiError("The AI fix action is available after a compile error appears.");
+      setIsAiPanelOpen(true);
+      return;
+    }
+
+    try {
+      setIsAiWorking(true);
+      setAiError(null);
+      setIsAiPanelOpen(true);
+
+      const response = await api.post<LatexAssistantResponse>(
+        "/latex/assistant",
+        action === "fix"
+          ? {
+              action,
+              prompt: assistantPrompt.trim() || undefined,
+              compiler,
+              currentTitle: docTitle,
+              currentContent: latexCode,
+              compileLogs,
+            }
+          : {
+              action,
+              prompt: assistantPrompt.trim(),
+              compiler,
+              currentTitle: docTitle,
+              currentContent: latexCode,
+            },
+      );
+
+      applyAssistantResult(response.data);
+    } catch (error) {
+      const message = getApiErrorMessage(error);
+      setAiError(message);
+      setStatusTone("error");
+      setStatusMessage(message);
+    } finally {
+      setIsAiWorking(false);
     }
   };
 
@@ -384,18 +508,20 @@ function EditorPanel({
       }
 
       const errorState = getDisplayError(parsedPayload);
-      setPreviewUrl(null);
+      clearPreview();
       setStatusTone("error");
       setStatusMessage(errorState.message);
       setCompileLogs(errorState.logs);
+      setIsAiPanelOpen(true);
     } catch (error) {
       console.error("Failed to compile latex document:", error);
-      setPreviewUrl(null);
+      clearPreview();
       setStatusTone("error");
       setStatusMessage(
-        "Compilation service tak request nahi gayi. Network/config once check kar lo.",
+        "The compilation request could not reach the service. Please check your network or configuration.",
       );
       setCompileLogs(error instanceof Error ? error.message : "");
+      setIsAiPanelOpen(true);
     } finally {
       setIsCompiling(false);
     }
@@ -412,11 +538,11 @@ function EditorPanel({
     anchor.click();
   };
 
-  const lineCount = Math.max(80, latexCode.split("\n").length + 10);
   const previewSrc = previewUrl ? buildPreviewSource(previewUrl, zoom) : null;
+  const canFixWithAi = Boolean(compileLogs.trim());
 
   return (
-    <div className="flex flex-col h-screen bg-[#0F0E09] font-gothic overflow-hidden text-white">
+    <div className="relative flex flex-col h-screen bg-[#0F0E09] font-gothic overflow-hidden text-white">
       <div className="flex items-center justify-between px-4 bg-[#1B1913] border-b border-white/5 shrink-0 h-11 gap-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <Link
@@ -484,6 +610,13 @@ function EditorPanel({
 
         <div className="flex items-center gap-2 flex-1 justify-end">
           <button
+            onClick={() => setIsAiPanelOpen((value) => !value)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] text-white/45 bg-white/5 border border-white/8 hover:border-white/20 hover:text-white/80 rounded-sm transition-all outline-none"
+          >
+            <Sparkles size={13} />
+            {isAiPanelOpen ? "Hide AI" : "AI Assist"}
+          </button>
+          <button
             onClick={handleSave}
             disabled={isSaving || isLoadingDoc}
             className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] text-white/45 bg-white/5 border border-white/8 hover:border-white/20 hover:text-white/80 rounded-sm transition-all outline-none disabled:opacity-50"
@@ -518,9 +651,22 @@ function EditorPanel({
               : "bg-white/[0.02] border-white/5 text-white/45"
           }`}
         >
-          <div className="flex items-center gap-2">
-            {statusTone === "error" && <FiAlertCircle size={12} />}
-            <span>{statusMessage}</span>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              {statusTone === "error" && <FiAlertCircle size={12} />}
+              <span>{statusMessage}</span>
+            </div>
+
+            {statusTone === "error" && canFixWithAi ? (
+              <button
+                type="button"
+                onClick={() => void runAssistant("fix")}
+                disabled={isAiWorking}
+                className="shrink-0 rounded-sm border border-red-300/20 bg-red-300/10 px-2.5 py-1 text-[11px] text-red-100 transition hover:bg-red-300/15 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isAiWorking ? "AI fixing..." : "Fix with AI"}
+              </button>
+            ) : null}
           </div>
         </div>
       )}
@@ -530,41 +676,50 @@ function EditorPanel({
           className="flex-1 flex min-w-0 overflow-hidden border-r border-white/5"
           style={{ maxWidth: "50%" }}
         >
-          <div className="relative w-full bg-[#0C0B08] overflow-hidden flex">
-            <div
-              className="shrink-0 w-11 flex flex-col items-end py-5 pr-3 text-[12px] font-mono select-none pointer-events-none overflow-hidden"
-              style={{
-                color: "rgba(255,255,255,0.12)",
-                background: "#0C0B08",
-                borderRight: "1px solid rgba(255,255,255,0.04)",
-                lineHeight: "1.6rem",
-              }}
-            >
-              {Array.from({ length: lineCount }).map((_, index) => (
-                <div
-                  key={index}
-                  style={{
-                    height: "1.6rem",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  {index + 1}
+          <div className="relative h-full w-full overflow-hidden bg-[#0C0B08]">
+            <Editor
+              beforeMount={configureLatexEditor}
+              height="100%"
+              language="latex"
+              loading={
+                <div className="flex h-full items-center justify-center text-sm text-white/30">
+                  <BiLoaderAlt size={18} className="mr-2 animate-spin" />
+                  Loading editor...
                 </div>
-              ))}
-            </div>
-
-            <textarea
-              className="flex-1 resize-none outline-none bg-transparent text-white/60 font-mono py-5 px-4 overflow-auto"
-              style={{
-                fontSize: "13.5px",
-                lineHeight: "1.6rem",
-                caretColor: "rgba(255,255,255,0.6)",
+              }
+              onChange={(value) => handleCodeChange(value ?? "")}
+              options={{
+                automaticLayout: true,
+                minimap: { enabled: false },
+                fontSize: 13.5,
+                lineHeight: 26,
+                fontLigatures: true,
+                scrollBeyondLastLine: false,
+                smoothScrolling: true,
+                lineNumbers: "on",
+                lineNumbersMinChars: 3,
+                glyphMargin: false,
+                folding: true,
+                renderLineHighlight: "line",
+                contextmenu: true,
+                overviewRulerBorder: false,
+                overviewRulerLanes: 0,
+                hideCursorInOverviewRuler: true,
+                padding: {
+                  top: 18,
+                  bottom: 18,
+                },
+                scrollbar: {
+                  verticalScrollbarSize: 10,
+                  horizontalScrollbarSize: 10,
+                },
+                tabSize: 2,
+                insertSpaces: true,
+                wordWrap: "off",
               }}
+              theme="vilo-monaco"
               value={latexCode}
-              onChange={(event) => handleCodeChange(event.target.value)}
-              spellCheck={false}
+              width="100%"
             />
           </div>
         </div>
@@ -599,7 +754,7 @@ function EditorPanel({
                     <div>
                       <p className="text-sm text-white/80">PDF Preview</p>
                       <p className="text-[11px] text-white/30">
-                        Compile dabate hi LaTeX-on-HTTP se generated PDF yahan show hoga.
+                        The PDF generated by LaTeX-on-HTTP will appear here after you compile.
                       </p>
                     </div>
                   </div>
@@ -610,8 +765,8 @@ function EditorPanel({
                     </pre>
                   ) : (
                     <div className="h-[360px] border border-dashed border-white/10 rounded-sm flex items-center justify-center text-center text-white/20 text-xs px-6">
-                      Current document ka live PDF preview dekhne ke liye
-                      `Compile` button use karo.
+                      Use the `Compile` button to view the live PDF preview for
+                      the current document.
                     </div>
                   )}
                 </div>
@@ -620,6 +775,108 @@ function EditorPanel({
           </div>
         </div>
       </div>
+
+      {isAiPanelOpen ? (
+        <div className="absolute right-4 top-16 z-20 w-[380px] max-w-[calc(100vw-2rem)] rounded-2xl border border-white/10 bg-[#171510]/95 p-4 shadow-[0_20px_80px_rgba(0,0,0,0.45)] backdrop-blur">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.28em] text-orange-200/60">
+                Latex AI
+              </p>
+              <h3 className="mt-1 text-sm font-semibold text-white/85">
+                Generate or fix code
+              </h3>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsAiPanelOpen(false)}
+              className="rounded-full p-1 text-white/35 transition hover:bg-white/5 hover:text-white/70"
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          <p className="mt-3 text-xs leading-5 text-white/45">
+            Describe the LaTeX document you want, or let AI fix the current code
+            after a compilation error.
+          </p>
+
+          <textarea
+            value={assistantPrompt}
+            onChange={(event) => setAssistantPrompt(event.target.value)}
+            placeholder="Example: Create a clean one-page resume with education, skills, projects, and experience."
+            className="mt-4 h-28 w-full resize-none rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/75 outline-none transition placeholder:text-white/20 focus:border-white/20"
+          />
+
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => void runAssistant("generate")}
+              disabled={isAiWorking}
+              className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#F0EDE7] px-4 py-2.5 text-sm font-semibold text-[#18130D] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isAiWorking ? (
+                <BiLoaderAlt size={14} className="animate-spin" />
+              ) : (
+                <Sparkles size={14} />
+              )}
+              Generate LaTeX
+            </button>
+
+            <button
+              type="button"
+              onClick={() => void runAssistant("fix")}
+              disabled={isAiWorking || !canFixWithAi}
+              className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white/70 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {isAiWorking ? (
+                <BiLoaderAlt size={14} className="animate-spin" />
+              ) : (
+                <WandSparkles size={14} />
+              )}
+              Fix Error
+            </button>
+          </div>
+
+          {!canFixWithAi ? (
+            <p className="mt-2 text-[11px] text-white/30">
+              The `Fix Error` button becomes available after a compile error appears.
+            </p>
+          ) : null}
+
+          {aiError ? (
+            <p className="mt-3 rounded-2xl border border-red-400/15 bg-red-950/20 px-3 py-2 text-xs text-red-200/85">
+              {aiError}
+            </p>
+          ) : null}
+
+          {aiResult ? (
+            <div className="mt-4 rounded-2xl border border-white/8 bg-black/25 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs uppercase tracking-[0.22em] text-white/35">
+                  Last AI update
+                </p>
+                <span className="text-[11px] text-white/35">{aiResult.model}</span>
+              </div>
+
+              <p className="mt-2 text-sm font-medium text-white/85">
+                {aiResult.summary}
+              </p>
+
+              {aiResult.nextSteps.length ? (
+                <div className="mt-3 space-y-2">
+                  {aiResult.nextSteps.map((step, index) => (
+                    <p key={`${step}-${index}`} className="text-xs leading-5 text-white/50">
+                      {index + 1}. {step}
+                    </p>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

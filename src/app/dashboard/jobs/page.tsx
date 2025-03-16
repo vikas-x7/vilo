@@ -126,7 +126,11 @@ export default function JobsPage() {
 
   const savedKeys = useMemo(
     () =>
-      new Set(bookmarks.map((bookmark) => `${bookmark.source}:${bookmark.externalId}`)),
+      new Set(
+        bookmarks.map(
+          (bookmark) => `${bookmark.source}:${bookmark.externalId}`,
+        ),
+      ),
     [bookmarks],
   );
 
@@ -136,7 +140,7 @@ export default function JobsPage() {
   );
 
   const visibleJobs = useMemo(() => {
-    const baseJobs = savedOnly ? savedJobs : jobsQuery.data?.jobs ?? [];
+    const baseJobs = savedOnly ? savedJobs : (jobsQuery.data?.jobs ?? []);
     return baseJobs.filter((job) => matchesSearch(job, deferredSearch));
   }, [deferredSearch, jobsQuery.data?.jobs, savedJobs, savedOnly]);
 
@@ -159,17 +163,19 @@ export default function JobsPage() {
           externalId: job.externalId,
         });
         setStatusTone("success");
-        setStatusMessage("Job saved list se remove ho gayi.");
+        setStatusMessage("Job removed from your saved list.");
         return;
       }
 
       await saveBookmark(toBookmarkPayload(job));
       setStatusTone("success");
-      setStatusMessage("Job successfully saved ho gayi.");
+      setStatusMessage("Job saved successfully.");
     } catch (error) {
       console.error("Failed to toggle job save state:", error);
       setStatusTone("error");
-      setStatusMessage("Job save state update nahi ho paayi. Please dobara try karo.");
+      setStatusMessage(
+        "We couldn't update the saved state for this job. Please try again.",
+      );
     }
   };
 
@@ -179,17 +185,14 @@ export default function JobsPage() {
     <div className="px-8 py-6 max-w-7xl mx-auto flex flex-col min-h-full">
       <div className="flex flex-col gap-5 border-b border-white/5 pb-6">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
-          <div className="max-w-2xl">
-            <p className="text-[10px] uppercase tracking-[0.28em] text-white/25 mb-2">
-              Job search
-            </p>
+          <div className="max-w-xl">
             <h1 className="text-2xl tracking-tight text-white/90">
               Search roles, save the best ones, and jump straight to the apply
               link.
             </h1>
             <p className="text-xs text-white/35 mt-2 leading-relaxed">
-              Feed Arbeitnow se aa rahi hai, aur saved jobs aapke account ke
-              saath persist ho rahi hain.
+              This feed is powered by Arbeitnow, and saved jobs stay synced with
+              your account.
             </p>
           </div>
 
@@ -205,7 +208,9 @@ export default function JobsPage() {
                 Page results
               </p>
               <p className="text-lg text-white/85 mt-2">
-                {savedOnly ? visibleJobs.length : jobsQuery.data?.jobs.length ?? 0}
+                {savedOnly
+                  ? visibleJobs.length
+                  : (jobsQuery.data?.jobs.length ?? 0)}
               </p>
             </div>
           </div>
@@ -294,7 +299,7 @@ export default function JobsPage() {
             </p>
             <p className="text-xs text-white/35 mt-1">
               {savedOnly
-                ? "Ye roles aapne save kiye hue hain."
+                ? "These are the roles you have saved."
                 : meta?.source
                   ? `Source: ${meta.source}`
                   : "Loading source..."}
@@ -302,30 +307,26 @@ export default function JobsPage() {
           </div>
 
           {!savedOnly && meta ? (
-            <div className="text-xs text-white/30">
-              Page {meta.currentPage}
-            </div>
+            <div className="text-xs text-white/30">Page {meta.currentPage}</div>
           ) : null}
         </div>
 
         {isLoading ? (
           <div className="rounded-sm border border-white/8 bg-white/[0.03] p-10 text-center">
             <FiLoader className="mx-auto mb-3 animate-spin text-white/35" />
-            <p className="text-sm text-white/45">Jobs load ho rahi hain...</p>
+            <p className="text-sm text-white/45">Loading jobs...</p>
           </div>
         ) : jobsQuery.isError && !savedOnly ? (
           <div className="rounded-sm border border-red-400/20 bg-red-400/10 p-6 text-sm text-red-100">
-            Jobs feed load nahi hui. RapidAPI key baad me add karni ho to
-            backend ready hai, abhi direct source se try ho raha hai.
+            The jobs feed could not be loaded. The backend is ready for a
+            RapidAPI key later, and for now it is trying the direct source.
           </div>
         ) : visibleJobs.length === 0 ? (
           <div className="rounded-sm border border-white/8 bg-white/[0.03] p-10 text-center">
             <FiBriefcase className="mx-auto mb-3 text-white/25" size={20} />
-            <p className="text-sm text-white/55">
-              Koi matching job nahi mili.
-            </p>
+            <p className="text-sm text-white/55">No matching jobs found.</p>
             <p className="text-xs text-white/25 mt-2">
-              Search ya filters reset karke dobara try karo.
+              Try resetting your search or filters.
             </p>
           </div>
         ) : (
@@ -415,7 +416,7 @@ export default function JobsPage() {
       {!savedOnly && meta && visibleJobs.length > 0 ? (
         <div className="mt-6 flex items-center justify-between rounded-sm border border-white/8 bg-white/[0.03] px-4 py-3">
           <p className="text-xs text-white/35">
-            Remote filter aur search ke saath page navigation available hai.
+            Pagination works with both the remote filter and search.
           </p>
 
           <div className="flex items-center gap-2">

@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: "Jobs abhi load nahi ho paayi. Please thodi der me try karo." },
+        { error: "Jobs could not be loaded right now. Please try again shortly." },
         { status: response.status },
       );
     }
@@ -128,7 +128,7 @@ export async function GET(req: NextRequest) {
     console.error("Failed to fetch jobs feed:", error);
 
     return NextResponse.json(
-      { error: "Jobs service se connect nahi ho paaya. Please dobara try karo." },
+      { error: "Could not connect to the jobs service. Please try again." },
       { status: 500 },
     );
   }

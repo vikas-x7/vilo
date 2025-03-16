@@ -32,3 +32,17 @@ export interface RoadmapDetail extends RoadmapListItem {
     edges: ReactFlowEdge[];
   };
 }
+
+export interface RoadmapExplainRequest {
+  roadmapTitle: string;
+  roadmapDescription?: string;
+  nodeId: string;
+  nodeTitle: string;
+  nodeSummary?: string;
+  relatedTopics?: string[];
+}
+
+export interface RoadmapExplainResponse {
+  explanation: string;
+  model: string;
+}

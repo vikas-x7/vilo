@@ -3,12 +3,24 @@
 import { portfolioRepository } from "./portfolio.repository";
 import { PortfolioData, SavePortfolioInput } from "./portfolio.types";
 
+const DUPLICATE_USERNAME_MESSAGE =
+  "Please use another username. This username already exists.";
+
 function normalizeUsername(username: string) {
   return username
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function isUniqueConstraintError(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === "P2002"
+  );
 }
 
 function createDefaultPortfolioData(
@@ -55,11 +67,19 @@ export const portfolioService = {
         : await portfolioRepository.findOwnerByUsername(normalizedUsername);
 
     if (usernameOwner && usernameOwner.id !== userId) {
-      throw new Error("This username is already taken");
+      throw new Error(DUPLICATE_USERNAME_MESSAGE);
     }
 
     if (normalizedUsername !== owner.username) {
-      await portfolioRepository.updateUsername(userId, normalizedUsername);
+      try {
+        await portfolioRepository.updateUsername(userId, normalizedUsername);
+      } catch (error: unknown) {
+        if (isUniqueConstraintError(error)) {
+          throw new Error(DUPLICATE_USERNAME_MESSAGE);
+        }
+
+        throw error;
+      }
     }
 
     return portfolioRepository.upsert(userId, input.data, input.isPublic);

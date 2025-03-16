@@ -20,12 +20,12 @@ export const Hero = () => (
         </a>
       </div>
 
-      <h1 className="text-4xl sm:text-5xl md:text-[47px] font-bold text-[#E6ECEC] leading-[1.05] tracking-tight mb-6 mt-4">
+      <h1 className="text-4xl sm:text-5xl md:text-[47px]  text-[#E6ECEC] leading-[1.05] tracking-tight mb-6 mt-4">
         LaTeX Documents Developer <br /> Portfolios Learning Roadmaps
       </h1>
 
       <p className="text-sm text-[#9A9996] max-w-lg mx-auto">
-        Write with precision, showcase with confidence, and learn with clarity —
+        Write with precision, showcase with confidence, and learn with clarity
         all inside one focused platform built for developers.
       </p>
     </div>

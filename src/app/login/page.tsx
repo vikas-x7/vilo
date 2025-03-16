@@ -11,6 +11,12 @@ import { BiLogoGithub } from "react-icons/bi";
 import { FcGoogle } from "react-icons/fc";
 import { GiRoundShield } from "react-icons/gi";
 
+type AuthSuccessResponse = {
+  data?: {
+    id?: number;
+  };
+};
+
 export default function LoginPage() {
   const router = useRouter();
 
@@ -24,7 +30,7 @@ export default function LoginPage() {
 
   const loginMutation = useMutation({
     mutationFn: authService.login,
-    onSuccess: (res: any) => {
+    onSuccess: (res: AuthSuccessResponse) => {
       if (res?.data?.id) {
         localStorage.setItem("user_id", res.data.id.toString());
       }

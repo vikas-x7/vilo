@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@/lib/prisma";
 
 export const roadmapRepository = {
   findAll() {

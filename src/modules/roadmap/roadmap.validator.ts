@@ -7,7 +7,7 @@ export const reactFlowNodeSchema = z.object({
     x: z.number(),
     y: z.number(),
   }),
-  data: z.record(z.unknown()),
+  data: z.record(z.string(), z.unknown()),
 });
 
 export const reactFlowEdgeSchema = z.object({
@@ -29,3 +29,16 @@ export const createRoadmapValidation = z.object({
 export const updateRoadmapValidation = createRoadmapValidation.partial();
 
 export type CreateRoadmapInput = z.infer<typeof createRoadmapValidation>;
+
+export const explainRoadmapNodeValidation = z.object({
+  roadmapTitle: z.string().trim().min(2),
+  roadmapDescription: z.string().trim().max(500).optional(),
+  nodeId: z.string().trim().min(1),
+  nodeTitle: z.string().trim().min(1),
+  nodeSummary: z.string().trim().max(700).optional(),
+  relatedTopics: z.array(z.string().trim().min(1)).max(8).optional(),
+});
+
+export type ExplainRoadmapNodeInput = z.infer<
+  typeof explainRoadmapNodeValidation
+>;

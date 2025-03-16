@@ -50,9 +50,7 @@ export default function SettingsPanel({
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-
     if (!file) return;
-
     setAvatar(URL.createObjectURL(file));
   };
 
@@ -66,11 +64,18 @@ export default function SettingsPanel({
     router.replace("/login");
   };
 
-  const avatarInitial = (name.trim()[0] ?? initialEmail[0] ?? "U").toUpperCase();
+  const avatarInitial = (
+    name.trim()[0] ??
+    initialEmail[0] ??
+    "U"
+  ).toUpperCase();
+
+  // ONLY CHANGE HERE (Sidebar width)
   const panelClasses =
     variant === "modal"
       ? "w-full max-h-[85vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#14120B] font-gothic text-white shadow-[0_28px_80px_rgba(0,0,0,0.45)]"
-      : "h-full w-full overflow-y-auto bg-[#14120B] font-gothic text-white";
+      : "h-full w-[280px] overflow-y-auto bg-[#14120B] font-gothic text-white";
+
   const headerClasses =
     variant === "modal"
       ? "sticky top-0 z-10 border-b border-white/5 bg-[#14120B]/95 px-8 py-6 backdrop-blur"
@@ -173,7 +178,9 @@ export default function SettingsPanel({
 
               <div>
                 <p className="text-[10px] text-white/25 mb-1">Email</p>
-                <p className="text-sm text-white/65 break-all">{initialEmail}</p>
+                <p className="text-sm text-white/65 break-all">
+                  {initialEmail}
+                </p>
               </div>
             </div>
           </div>
@@ -258,26 +265,6 @@ export default function SettingsPanel({
                 Log out
               </button>
             </div>
-          </div>
-        </section>
-
-        <section>
-          <p className="text-[10px] text-red-500/50 uppercase tracking-widest mb-3">
-            Danger Zone
-          </p>
-          <div className="bg-red-950/20 border border-red-500/10 rounded-sm px-5 py-4 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <FiTrash2 size={14} className="text-red-400/50 shrink-0" />
-              <div>
-                <p className="text-sm text-white/60">Delete account</p>
-                <p className="text-[10px] text-white/25 mt-0.5">
-                  Permanently delete your account and all associated data.
-                </p>
-              </div>
-            </div>
-            <button className="px-3 py-1.5 text-xs text-red-400/70 bg-red-500/10 border border-red-500/15 hover:border-red-500/30 hover:text-red-400 rounded-sm transition-all shrink-0">
-              Delete
-            </button>
           </div>
         </section>
       </div>

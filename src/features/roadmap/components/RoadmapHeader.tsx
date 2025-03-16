@@ -1,11 +1,8 @@
 import React from "react";
-import { FiFilter, FiSearch } from "react-icons/fi";
+import { FiSearch } from "react-icons/fi";
 import { useRoadmapStore } from "../store/roadmap.store";
 
-const filters = ["All", "Beginner", "Intermediate", "Advanced"];
-
 export default function RoadmapHeader() {
-  const [active, setActive] = React.useState("All");
   const search = useRoadmapStore((state) => state.search);
   const setSearch = useRoadmapStore((state) => state.setSearch);
 

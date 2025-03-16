@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
     console.error("Failed to load job bookmarks:", error);
 
     return NextResponse.json(
-      { error: "Saved jobs load nahi ho paaye." },
+      { error: "Saved jobs could not be loaded." },
       { status: 500 },
     );
   }
@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: "Job save nahi ho paaya." },
+      { error: "The job could not be saved." },
       { status: 500 },
     );
   }
@@ -181,7 +181,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: "Saved job remove nahi ho paaya." },
+      { error: "The saved job could not be removed." },
       { status: 500 },
     );
   }

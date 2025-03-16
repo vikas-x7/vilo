@@ -3,6 +3,7 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { api } from "@/lib/axios";
+import { latexTemplateCatalog } from "@/modules/latex/latex.templates";
 import {
   FiSearch,
   FiPlus,
@@ -11,57 +12,6 @@ import {
   FiTrash2,
   FiAlertTriangle,
 } from "react-icons/fi";
-
-const presetTemplates = [
-  {
-    id: "resume-standard",
-    name: "Professional Resume",
-    description:
-      "A clean, modern two-column resume template suitable for all professions.",
-    image:
-      "https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=400&auto=format&fit=crop",
-  },
-  {
-    id: "research-ieee",
-    name: "Research Paper (IEEE)",
-    description:
-      "Standard IEEE two-column format for academic research papers and conferences.",
-    image:
-      "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?q=80&w=400&auto=format&fit=crop",
-  },
-  {
-    id: "report-tech",
-    name: "Technical Report",
-    description:
-      "Comprehensive layout with title page, table of contents, and chapters.",
-    image:
-      "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=400&auto=format&fit=crop",
-  },
-  {
-    id: "presentation-beamer",
-    name: "Slide Presentation",
-    description:
-      "Minimalist Beamer template for academic or professional slide decks.",
-    image:
-      "https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=400&auto=format&fit=crop",
-  },
-  {
-    id: "cover-letter",
-    name: "Cover Letter",
-    description:
-      "Formal business letter template matching the Professional Resume style.",
-    image:
-      "https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?q=80&w=400&auto=format&fit=crop",
-  },
-  {
-    id: "assignment",
-    name: "Homework Assignment",
-    description:
-      "Simple single-column format with question/answer block environments.",
-    image:
-      "https://images.unsplash.com/photo-1456406644174-8ddd4cd52a06?q=80&w=400&auto=format&fit=crop",
-  },
-];
 
 interface LatexVersion {
   id: number;
@@ -130,7 +80,7 @@ export default function LatexPage() {
         console.error("Failed to load latex documents:", error);
 
         if (isMounted) {
-          setDocsError("Documents load nahi ho paaye. Please refresh and try again.");
+          setDocsError("Documents could not be loaded. Please refresh and try again.");
         }
       } finally {
         if (isMounted) {
@@ -146,7 +96,7 @@ export default function LatexPage() {
     };
   }, []);
 
-  const filteredPresets = presetTemplates.filter(
+  const filteredPresets = latexTemplateCatalog.filter(
     (t) =>
       t.name.toLowerCase().includes(search.toLowerCase()) ||
       t.description.toLowerCase().includes(search.toLowerCase()),
@@ -176,7 +126,7 @@ export default function LatexPage() {
       setDocToDelete(null);
     } catch (error) {
       console.error("Failed to delete latex document:", error);
-      setDocsError("Document delete nahi hua. Please dobara try karo.");
+      setDocsError("The document could not be deleted. Please try again.");
     } finally {
       setIsDeleting(false);
     }
@@ -351,12 +301,22 @@ export default function LatexPage() {
                 className="group flex flex-col bg-[#1B1913] border border-white/5 rounded-sm overflow-hidden hover:border-white/15 transition-all duration-300"
               >
                 <div className="relative w-full aspect-video overflow-hidden">
-                  <div className="absolute inset-0 bg-black/40 z-10" />
-                  <img
-                    src={template.image}
-                    alt={template.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-60"
-                  />
+                  {template.image ? (
+                    <>
+                      <div className="absolute inset-0 bg-black/40 z-10" />
+                      <img
+                        src={template.image}
+                        alt={template.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-60"
+                      />
+                    </>
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,#2A241B_0%,#15120D_100%)] px-4 text-center">
+                      <div className="text-[11px] uppercase tracking-[0.22em] text-white/35">
+                        Template Preview
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="p-3 flex flex-col flex-1">
                   <h3 className="text-xs font-medium text-white/80 group-hover:text-white transition-colors mb-1">
@@ -402,8 +362,7 @@ export default function LatexPage() {
               </h2>
               <p className="text-xs text-white/35 leading-relaxed mt-2">
                 <span className="text-white/60">&quot;{docToDelete.name}&quot;</span>{" "}
-                ko permanently remove kar diya jayega. Delete karne se pehle ek
-                baar confirm kar lo.
+                will be permanently removed. Please confirm before continuing.
               </p>
             </div>
 
