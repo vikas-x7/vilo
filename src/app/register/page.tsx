@@ -1,13 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { authService } from "@/services/auth.service";
 import { useRouter } from "next/navigation";
 import { registerSchema } from "@/modules/auth/auth.validator";
 import Link from "next/link";
-import { BiLogoGithub } from "react-icons/bi";
-import { FcGoogle } from "react-icons/fc";
 import { GiRoundShield } from "react-icons/gi";
 
 type AuthSuccessResponse = {
@@ -20,6 +19,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -37,6 +37,11 @@ export default function RegisterPage() {
     e.preventDefault();
     setValidationError(null);
 
+    if (password !== confirmPassword) {
+      setValidationError("Passwords do not match");
+      return;
+    }
+
     const result = registerSchema.safeParse({ email, password });
     if (!result.success) {
       setValidationError(result.error.issues[0]?.message || "Invalid input");
@@ -50,10 +55,13 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-stretch bg-[#14120B] font-gothic">
       {/* Left — Image */}
       <div className="hidden lg:block w-1/2 relative overflow-hidden h-screen">
-        <img
+        <Image
           src="https://i.pinimg.com/736x/f6/60/fd/f660fdc0be1bc9faa08799fe28424dae.jpg"
           alt="Register visual"
-          className="w-full h-full object-cover"
+          fill
+          priority
+          sizes="50vw"
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-black/30" />
       </div>
@@ -118,6 +126,21 @@ export default function RegisterPage() {
               </div>
             </div>
 
+            {/* Confirm Password */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-white/70">
+                Confirm password
+              </label>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="w-full border border-white/10 bg-white/5 rounded-sm px-4 py-2 text-sm text-white placeholder-white/20 outline-none focus:border-white/30 transition-all"
+              />
+            </div>
+
             {/* Errors */}
             {validationError && (
               <p className="text-xs text-red-400">{validationError}</p>
@@ -141,16 +164,16 @@ export default function RegisterPage() {
           </form>
 
           {/* Divider */}
-          <div className="flex items-center gap-3 my-5">
+          {/* <div className="flex items-center gap-3 my-5">
             <div className="flex-1 h-px bg-white/10" />
             <span className="text-xs text-white/25 whitespace-nowrap">
               or continue with
             </span>
             <div className="flex-1 h-px bg-white/10" />
-          </div>
+          </div> */}
 
           {/* Social buttons */}
-          <div className="flex gap-3">
+          {/* <div className="flex gap-3">
             <button
               type="button"
               aria-label="Continue with Google"
@@ -169,7 +192,7 @@ export default function RegisterPage() {
                 <BiLogoGithub /> Github
               </span>
             </button>
-          </div>
+          </div> */}
 
           {/* Footer */}
           <p className="text-center text-sm text-white/30 mt-6">

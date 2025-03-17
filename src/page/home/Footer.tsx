@@ -9,7 +9,7 @@ function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <h3 className="text-lg text-start flex items-center gap-2">
-              <GiRoundShield size={25} /> Vilo
+              <GiRoundShield size={25} /> Helix AI
             </h3>
             <p className="text-sm text-neutral-500">
               Write with precision, showcase with confidence, and learn with
@@ -59,7 +59,7 @@ function Footer() {
 
         {/* Bottom Section */}
         <div className="mt-12 pt-6  flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-neutral-500">
-          <p>© 2026 vilo. All rights reserved.</p>
+          <p>© 2026 Helix AI. All rights reserved.</p>
           <div className="flex gap-6">
             <span className="hover:text-black cursor-pointer transition">
               Twitter

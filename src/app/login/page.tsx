@@ -141,16 +141,16 @@ export default function LoginPage() {
           </form>
 
           {/* Divider */}
-          <div className="flex items-center gap-3 my-5">
+          {/* <div className="flex items-center gap-3 my-5">
             <div className="flex-1 h-px bg-white/10" />
             <span className="text-xs text-white/25 whitespace-nowrap">
               or continue with
             </span>
             <div className="flex-1 h-px bg-white/10" />
-          </div>
+          </div> */}
 
           {/* Social buttons */}
-          <div className="flex gap-3">
+          {/* <div className="flex gap-3">
             <button
               type="button"
               aria-label="Continue with Google"
@@ -169,7 +169,7 @@ export default function LoginPage() {
                 <BiLogoGithub /> Github
               </span>
             </button>
-          </div>
+          </div> */}
 
           <p className="text-center text-sm text-white/30 mt-6">
             Don&#39;t have an account?{" "}

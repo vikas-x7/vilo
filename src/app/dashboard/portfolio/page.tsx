@@ -195,7 +195,9 @@ export default function PortfolioPage() {
   const [avatarRef] = useState(() => createRef<HTMLInputElement>());
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
-  const [statusTone, setStatusTone] = useState<"success" | "error" | null>(null);
+  const [statusTone, setStatusTone] = useState<"success" | "error" | null>(
+    null,
+  );
 
   useEffect(() => {
     if (qData) {
@@ -204,7 +206,11 @@ export default function PortfolioPage() {
   }, [qData]);
 
   const portfolioUrl = buildPortfolioUrl(data.username, data.deployedUrl);
-  const avatarFallback = (data.name.trim()[0] ?? data.username.trim()[0] ?? "U").toUpperCase();
+  const avatarFallback = (
+    data.name.trim()[0] ??
+    data.username.trim()[0] ??
+    "U"
+  ).toUpperCase();
 
   const handleSave = async () => {
     try {
@@ -244,27 +250,31 @@ export default function PortfolioPage() {
     }
   };
 
-  const setField = <K extends keyof PortfolioData>(key: K, val: PortfolioData[K]) =>
-    setData((p) => ({ ...p, [key]: val }));
+  const setField = <K extends keyof PortfolioData>(
+    key: K,
+    val: PortfolioData[K],
+  ) => setData((p) => ({ ...p, [key]: val }));
 
-  const updateItem = <K extends "experience" | "projects" | "education" | "activities">(
+  const updateItem = <
+    K extends "experience" | "projects" | "education" | "activities",
+  >(
     key: K,
     id: number,
     patch: Partial<PortfolioData[K][number]>,
   ) =>
     setField(
       key,
-      data[key].map((x) => (x.id === id ? { ...x, ...patch } : x)) as PortfolioData[K],
+      data[key].map((x) =>
+        x.id === id ? { ...x, ...patch } : x,
+      ) as PortfolioData[K],
     );
 
-  const removeItem = <K extends "experience" | "projects" | "education" | "activities">(
+  const removeItem = <
+    K extends "experience" | "projects" | "education" | "activities",
+  >(
     key: K,
     id: number,
-  ) =>
-    setField(
-      key,
-      data[key].filter((x) => x.id !== id) as PortfolioData[K],
-    );
+  ) => setField(key, data[key].filter((x) => x.id !== id) as PortfolioData[K]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(portfolioUrl);
@@ -394,7 +404,9 @@ export default function PortfolioPage() {
                   />
                 ))}
                 <button
-                  onClick={() => setField("skills", [...data.skills, "New Skill"])}
+                  onClick={() =>
+                    setField("skills", [...data.skills, "New Skill"])
+                  }
                   className="flex items-center gap-1 px-2 py-0.5 text-[10px] border border-dashed border-white/10 text-white/25 rounded-sm hover:border-white/20 hover:text-white/50 transition-all"
                 >
                   <FiPlus size={9} /> Add
@@ -713,8 +725,9 @@ export default function PortfolioPage() {
 
         {/* ── Right Sidebar ── */}
         <div
-          className={`shrink-0 border-l border-white/5 bg-[#171510] overflow-hidden flex flex-col transition-all duration-300 ease-in-out ${rightSidebarOpen ? "w-110" : "w-0 border-l-0"
-            }`}
+          className={`shrink-0 border-l border-white/5 bg-[#171510] overflow-hidden flex flex-col transition-all duration-300 ease-in-out ${
+            rightSidebarOpen ? "w-110" : "w-0 border-l-0"
+          }`}
         >
           <div className="w-110 flex flex-col h-full">
             {/* Panel Header */}
@@ -806,10 +819,11 @@ export default function PortfolioPage() {
                 </button>
                 {statusMessage && (
                   <div
-                    className={`rounded-sm px-3 py-2.5 mb-3 border text-[11px] leading-relaxed ${statusTone === "error"
-                      ? "bg-red-950/20 border-red-500/10 text-red-300/80"
-                      : "bg-white/[0.03] border-white/5 text-white/45"
-                      }`}
+                    className={`rounded-sm px-3 py-2.5 mb-3 border text-[11px] leading-relaxed ${
+                      statusTone === "error"
+                        ? "bg-red-950/20 border-red-500/10 text-red-300/80"
+                        : "bg-white/[0.03] border-white/5 text-white/45"
+                    }`}
                   >
                     {statusMessage}
                   </div>
@@ -915,7 +929,7 @@ export default function PortfolioPage() {
             {/* Footer */}
             <div className="p-4 border-t border-white/5 shrink-0">
               <p className="text-[9px] text-white/15 text-center">
-                vilo.app · portfolio builder
+                Helix AI · portfolio builder
               </p>
             </div>
           </div>

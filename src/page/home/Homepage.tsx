@@ -10,7 +10,7 @@ export const Hero = () => (
     <div className="relative z-10 flex flex-col items-center w-full max-w-3xl mx-auto">
       <div className="flex items-center gap-0 border border-stone-300 rounded-sm overflow-hidden shadow-sm">
         <span className="px-3 sm:px-4 py-1.5 text-xs text-black bg-[#f0ede7] border-r border-stone-300">
-          Introducing vilo
+          Introducing Helix AI
         </span>
         <a
           href="#"

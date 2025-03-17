@@ -10,7 +10,7 @@ const gothic = Zen_Kaku_Gothic_New({
 });
 
 export const metadata: Metadata = {
-  title: "vilo",
+  title: "Helix AI",
 };
 export default function RootLayout({
   children,

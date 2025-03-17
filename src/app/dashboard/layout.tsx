@@ -147,7 +147,7 @@ export default function DashboardLayout({
             {!collapsed && (
               <span className="text-sm tracking-tight text-white/70 flex gap-2">
                 <GiRoundShield size={20} className="text-white/70 shrink-0" />
-                Vilo
+                Helix AI
               </span>
             )}
           </div>

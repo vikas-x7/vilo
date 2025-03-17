@@ -11,7 +11,7 @@ export const Navbar = () => {
     <nav className="relative z-50 flex items-center justify-between px-4 sm:px-6 md:px-10 py-4 w-full max-w-7xl mx-auto border-x border-[#38352e] font-mono">
       {/* Logo */}
       <div className="flex items-center gap-2 text-[#E6ECEC]">
-        <GiRoundShield size={25} /> Vilo
+        <GiRoundShield size={25} /> Helix AI
       </div>
 
       {/* Desktop Nav Links */}
