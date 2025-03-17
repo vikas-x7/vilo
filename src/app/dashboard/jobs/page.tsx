@@ -186,37 +186,17 @@ export default function JobsPage() {
       <div className="flex flex-col gap-5 border-b border-white/5 pb-6">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
           <div className="max-w-xl">
-            <h1 className="text-2xl tracking-tight text-white/90">
-              Search roles, save the best ones, and jump straight to the apply
-              link.
+            <h1 className="text-3xl tracking-tight text-white/90">
+              Find jobs, save the best ones, and apply instantly.
             </h1>
             <p className="text-xs text-white/35 mt-2 leading-relaxed">
               This feed is powered by Arbeitnow, and saved jobs stay synced with
               your account.
             </p>
           </div>
-
-          <div className="grid grid-cols-2 gap-3 w-full lg:w-auto">
-            <div className="rounded-sm border border-white/8 bg-white/[0.03] px-4 py-3 min-w-36">
-              <p className="text-[10px] uppercase tracking-[0.24em] text-white/25">
-                Saved jobs
-              </p>
-              <p className="text-lg text-white/85 mt-2">{bookmarks.length}</p>
-            </div>
-            <div className="rounded-sm border border-white/8 bg-white/[0.03] px-4 py-3 min-w-36">
-              <p className="text-[10px] uppercase tracking-[0.24em] text-white/25">
-                Page results
-              </p>
-              <p className="text-lg text-white/85 mt-2">
-                {savedOnly
-                  ? visibleJobs.length
-                  : (jobsQuery.data?.jobs.length ?? 0)}
-              </p>
-            </div>
-          </div>
         </div>
 
-        <div className="flex flex-col xl:flex-row gap-3 xl:items-center xl:justify-between">
+        <div className="flex flex-col xl:flex-row gap-3 xl:items-center xl:justify-between mt-10 mb-2">
           <div className="relative w-full xl:max-w-md">
             <FiSearch
               size={14}

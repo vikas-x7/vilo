@@ -2,7 +2,7 @@
 
 import SettingsPanel from "./components/SettingsPanel";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import type { SafeUser } from "@/modules/auth/auth.types";
 import { authService } from "@/services/auth.service";
 import { GiRoundShield } from "react-icons/gi";
@@ -36,11 +36,9 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [collapsed, setCollapsed] = useState(false);
   const [currentUser, setCurrentUser] = useState<SafeUser | null>(null);
   const [isUserLoading, setIsUserLoading] = useState(true);
-  const isSettingsOpen = searchParams.get("modal") === "settings";
 
   useEffect(() => {
     let isMounted = true;
@@ -83,33 +81,6 @@ export default function DashboardLayout({
     };
   }, [router]);
 
-  useEffect(() => {
-    if (!isSettingsOpen) {
-      return;
-    }
-
-    const originalOverflow = document.body.style.overflow;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") {
-        return;
-      }
-
-      const params = new URLSearchParams(searchParams.toString());
-      params.delete("modal");
-      const query = params.toString();
-
-      router.replace(query ? `${pathname}?${query}` : pathname);
-    };
-
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isSettingsOpen, pathname, router, searchParams]);
-
   const displayName =
     currentUser?.username ||
     currentUser?.email?.split("@")[0] ||
@@ -117,20 +88,6 @@ export default function DashboardLayout({
   const displayEmail =
     currentUser?.email ||
     (isUserLoading ? "Fetching account..." : "No email found");
-  const openSettings = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("modal", "settings");
-    const query = params.toString();
-
-    router.push(query ? `${pathname}?${query}` : pathname);
-  };
-  const closeSettings = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("modal");
-    const query = params.toString();
-
-    router.replace(query ? `${pathname}?${query}` : pathname);
-  };
 
   return (
     <div className="flex h-screen bg-[#14120B] text-white overflow-hidden font-gothic">
@@ -188,26 +145,13 @@ export default function DashboardLayout({
               </Link>
             );
           })}
-          <button
-            type="button"
-            title={collapsed ? "Settings" : undefined}
-            onClick={openSettings}
-            className={`flex items-center gap-3 px-3 py-2 rounded-sm transition-all duration-200 ${
-              collapsed ? "justify-center" : ""
-            } ${
-              isSettingsOpen
-                ? "bg-white/8 text-white/90"
-                : "text-white/40 hover:text-white/80 hover:bg-white/5"
-            }`}
-          >
-            <FiSettings
-              size={15}
-              className={`shrink-0 ${
-                isSettingsOpen ? "text-white/70" : "text-white/30"
-              }`}
+          <Suspense fallback={<SettingsButtonFallback collapsed={collapsed} />}>
+            <DashboardSettingsControls
+              collapsed={collapsed}
+              displayEmail={displayEmail}
+              displayName={displayName}
             />
-            {!collapsed && <span>Settings</span>}
-          </button>
+          </Suspense>
         </nav>
 
         <div className="mt-auto">
@@ -245,6 +189,102 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto">{children}</main>
+    </div>
+  );
+}
+
+function SettingsButtonFallback({ collapsed }: { collapsed: boolean }) {
+  return (
+    <div
+      className={`flex items-center gap-3 px-3 py-2 rounded-sm text-white/20 ${
+        collapsed ? "justify-center" : ""
+      }`}
+    >
+      <FiSettings size={15} className="shrink-0 text-white/20" />
+      {!collapsed && <span>Settings</span>}
+    </div>
+  );
+}
+
+function DashboardSettingsControls({
+  collapsed,
+  displayEmail,
+  displayName,
+}: {
+  collapsed: boolean;
+  displayEmail: string;
+  displayName: string;
+}) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const isSettingsOpen = searchParams.get("modal") === "settings";
+
+  useEffect(() => {
+    if (!isSettingsOpen) {
+      return;
+    }
+
+    const originalOverflow = document.body.style.overflow;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("modal");
+      const query = params.toString();
+
+      router.replace(query ? `${pathname}?${query}` : pathname);
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isSettingsOpen, pathname, router, searchParams]);
+
+  const openSettings = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("modal", "settings");
+    const query = params.toString();
+
+    router.push(query ? `${pathname}?${query}` : pathname);
+  };
+
+  const closeSettings = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("modal");
+    const query = params.toString();
+
+    router.replace(query ? `${pathname}?${query}` : pathname);
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        title={collapsed ? "Settings" : undefined}
+        onClick={openSettings}
+        className={`flex items-center gap-3 px-3 py-2 rounded-sm transition-all duration-200 ${
+          collapsed ? "justify-center" : ""
+        } ${
+          isSettingsOpen
+            ? "bg-white/8 text-white/90"
+            : "text-white/40 hover:text-white/80 hover:bg-white/5"
+        }`}
+      >
+        <FiSettings
+          size={15}
+          className={`shrink-0 ${
+            isSettingsOpen ? "text-white/70" : "text-white/30"
+          }`}
+        />
+        {!collapsed && <span>Settings</span>}
+      </button>
 
       {isSettingsOpen && (
         <div
@@ -264,6 +304,6 @@ export default function DashboardLayout({
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
