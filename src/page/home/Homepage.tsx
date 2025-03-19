@@ -8,19 +8,19 @@ import { SiFuturelearn } from "react-icons/si";
 export const Hero = () => (
   <section className="relative flex flex-col items-center justify-center text-center overflow-hidden mt-16 sm:mt-20 md:mt-24 px-4 sm:px-6 lg:px-8">
     <div className="relative z-10 flex flex-col items-center w-full max-w-3xl mx-auto">
-      <div className="flex items-center gap-0 border border-stone-300 rounded-sm overflow-hidden shadow-sm">
-        <span className="px-3 sm:px-4 py-1.5 text-xs text-black bg-[#f0ede7] border-r border-stone-300">
-          Introducing Helix AI
+      <div className="flex items-center gap-0 border border-[#303030]  overflow-hidden shadow-sm">
+        <span className="px-3 sm:px-4 py-1.5 text-xs text-[#FAFAFA]  border-r border-[#303030]">
+          Introducing Vilo
         </span>
         <a
           href="#"
-          className="px-3 sm:px-4 py-1.5 text-xs font-mono font-semibold text-white hover:bg-stone-700 transition-colors flex gap-1.5 items-center justify-center"
+          className="px-3 sm:px-4 py-1.5 text-xs font-mono bg-[#F5F5F5] text-black  transition-colors flex gap-1.5 items-center justify-center"
         >
-          Try now <IoIosArrowRoundForward />
+          Try now <IoIosArrowRoundForward className="mt-0.5" />
         </a>
       </div>
 
-      <h1 className="text-4xl sm:text-5xl md:text-[47px]  text-[#E6ECEC] leading-[1.05] tracking-tight mb-6 mt-4">
+      <h1 className="text-4xl sm:text-5xl md:text-[57px]  text-[#E6ECEC] leading-[1] -tracking-[3px] mb-6 mt-4 ">
         LaTeX Documents Developer <br /> Portfolios Learning Roadmaps
       </h1>
 
@@ -32,8 +32,8 @@ export const Hero = () => (
 
     <div className="relative w-full h-screen max-w-6xl mt-12 sm:mt-16 md:mt-20 px-0">
       <img
-        className="w-full rounded-sm opacity-35"
-        src="https://i.pinimg.com/736x/21/ce/52/21ce5263171481886a153ad6ab9d9c92.jpg"
+        className="w-full h-155 rounded-sm opacity-80"
+        src="https://i.pinimg.com/736x/d2/03/23/d2032328af81cb7f3fe4d81c645c4016.jpg"
         alt=""
       />
       <img
@@ -73,7 +73,7 @@ export const Hero = () => (
 
       <a
         href="#"
-        className="w-full sm:w-64 md:w-72 bg-[#1B1913] text-[#EDECEC] text-sm text-start rounded-sm border border-[#393732]/20 p-6 flex flex-col justify-between transition-all"
+        className="w-full sm:w-64 md:w-72 bg-[#0A0A0A] text-[#EDECEC] text-sm text-start rounded-sm border border-[#303030]/30 p-6 flex flex-col justify-between transition-all"
       >
         <div className="flex items-start justify-between">
           <div className="w-8 h-8 rounded-sm flex items-center justify-center">
@@ -97,7 +97,7 @@ export const Hero = () => (
       {/* Card 2 */}
       <a
         href="#"
-        className="w-full sm:w-64 md:w-72 bg-[#1B1913] text-[#EDECEC] text-sm text-start rounded-sm border border-[#393732]/20 p-6 flex flex-col justify-between transition-all"
+        className="w-full sm:w-64 md:w-72 bg-[#0A0A0A] text-[#EDECEC] text-sm text-start rounded-sm border border-[#303030]/30 p-6 flex flex-col justify-between transition-all"
       >
         <div className="flex items-start justify-between">
           <div className="w-8 h-8 rounded-sm flex items-center justify-center">
@@ -120,7 +120,7 @@ export const Hero = () => (
 
       <a
         href="#"
-        className="w-full sm:w-64 md:w-72 bg-[#1B1913] text-[#EDECEC] text-sm text-start rounded-sm border border-[#393732]/20 p-6 flex flex-col justify-between transition-all"
+        className="w-full sm:w-64 md:w-72 bg-[#0A0A0A] text-[#EDECEC] text-sm text-start rounded-sm border border-[#303030]/30 p-6 flex flex-col justify-between transition-all"
       >
         <div className="flex items-start justify-between">
           <div className="w-8 h-8 rounded-sm flex items-center justify-center">
@@ -173,7 +173,7 @@ export const Hero = () => (
       </div>
     </div>
 
-    <div className="w-full max-w-6xl rounded-sm bg-[#1B1913] border border-[#393732]/20 mb-16 flex flex-col items-center justify-center py-16 px-6 mt-20 sm:mt-32 md:mt-40 text-center">
+    <div className="w-full max-w-6xl rounded-sm bg-[#0A0A0A] border border-[#393732]/20 mb-16 flex flex-col items-center justify-center py-16 px-6 mt-20 sm:mt-32 md:mt-40 text-center">
       <h1 className="text-[#E6ECEC]/80 mb-4 text-sm sm:text-base">
         Build Your Profile, Showcase Your Work, and Grow With Direction
       </h1>

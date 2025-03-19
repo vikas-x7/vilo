@@ -3,14 +3,19 @@ import { GiRoundShield } from "react-icons/gi";
 
 function Footer() {
   return (
-    <footer className="w-full  text-white font-gothic">
+    <footer className="w-full   text-white font-gothic">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand */}
           <div className="space-y-4">
-            <h3 className="text-lg text-start flex items-center gap-2">
-              <GiRoundShield size={25} /> Helix AI
-            </h3>
+            <div className="flex items-center gap-2 text-[#FAFAFA] text-[20px]">
+              <img
+                src="https://i.pinimg.com/736x/f6/77/82/f6778272ae65ab1c8a7c42520899250f.jpg"
+                alt=""
+                className="w-5 h-5 rounded-[1px]"
+              />
+              Vilo
+            </div>
             <p className="text-sm text-neutral-500">
               Write with precision, showcase with confidence, and learn with
               clarity all in one focused platform.
@@ -59,7 +64,7 @@ function Footer() {
 
         {/* Bottom Section */}
         <div className="mt-12 pt-6  flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-neutral-500">
-          <p>© 2026 Helix AI. All rights reserved.</p>
+          <p>© 2026 Vilo. All rights reserved.</p>
           <div className="flex gap-6">
             <span className="hover:text-black cursor-pointer transition">
               Twitter
