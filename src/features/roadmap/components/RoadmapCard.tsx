@@ -14,7 +14,7 @@ export function RoadmapCard({ item, isSaved, onToggle, onClick }: Props) {
   return (
     <div
       onClick={onClick}
-      className="group bg-[#1B1913] border border-white/5 hover:border-white/15 rounded-sm p-4 cursor-pointer h-35 relative"
+      className="group bg-[#0A0A0A] border border-white/5 hover:border-white/15 rounded-sm p-4 cursor-pointer h-35 relative"
     >
       <button
         onClick={(e) => {
