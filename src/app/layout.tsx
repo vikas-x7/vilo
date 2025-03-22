@@ -1,16 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Zen_Kaku_Gothic_New } from "next/font/google";
 import { QueryProvider } from "@/providers/QueryProvider";
 
-const gothic = Zen_Kaku_Gothic_New({
-  subsets: ["latin"],
-  weight: "500",
-  variable: "--font-vilo-gothic",
-});
-
 export const metadata: Metadata = {
-  title: "Helix AI",
+  title: "Vilo",
 };
 export default function RootLayout({
   children,
@@ -18,7 +11,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${gothic.variable}`}>
+    <html lang="en">
       <body>
         <QueryProvider>{children}</QueryProvider>
       </body>

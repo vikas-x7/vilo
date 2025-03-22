@@ -1,23 +1,25 @@
 import Footer from "@/page/home/Footer";
 import { Hero } from "@/page/home/Homepage";
+import MarqueeSection from "@/page/home/MarqueeSection";
 import { Navbar } from "@/page/home/Navbat";
 
 export default function Page() {
   return (
     <>
-      <div className="bg-[#14120B] min-h-screen flex justify-center font-gothic">
-        <div className="fixed top-0 left-0 w-full border-dashed border-b border-[#38352e] z-50 bg-[#14120B]">
+      <div className=" bg-black  flex justify-center font-gothic ">
+        <div className="fixed top-0 left-0 w-full border-dashed border-b border-[#303030] z-50 bg-black   ">
+          <MarqueeSection />
           <div className="max-w-7xl mx-auto">
             <Navbar />
           </div>
         </div>
 
-        <div className="w-full max-w-7xl border-dashed border-x border-[#38352e] pt-20 pb-24">
+        <div className="w-full  max-w-7xl border-dashed border-x border-[#303030]  pt-20 pb-24">
           <Hero />
         </div>
       </div>
-      <div className="left-0 w-full border-t border-[#38352e] z-50 bg-[#14120B]">
-        <div className="max-w-7xl mx-auto border-x border-[#38352e] ">
+      <div className="left-0 w-full border-t border-[#303030] z-50 bg-black ">
+        <div className="max-w-7xl mx-auto border-x border-[#303030]">
           <Footer />
         </div>
       </div>

@@ -90,22 +90,26 @@ export default function DashboardLayout({
     (isUserLoading ? "Fetching account..." : "No email found");
 
   return (
-    <div className="flex h-screen bg-[#14120B] text-white overflow-hidden font-gothic">
+    <div className="flex h-screen bg-black text-white overflow-hidden font-gothic">
       <aside
         className={`${
           collapsed ? "w-14" : "w-56"
-        } bg-[#1B1913] border-r border-white/5 hidden md:flex flex-col shrink-0 transition-all duration-300 ease-in-out relative`}
+        } bg-black border-r border-[#303030] hidden md:flex flex-col shrink-0 transition-all duration-300 ease-in-out relative`}
       >
         {/* Logo */}
         <div
-          className={`px-4 py-4 border-b border-white/5 flex items-center justify-between ${collapsed ? "justify-center" : "gap-2"}`}
+          className={`px-4 py-2 border-b border-[#303030] flex items-center justify-between ${collapsed ? "justify-center" : "gap-2"}`}
         >
           <div className="flex gap-1">
             {!collapsed && (
-              <span className="text-sm tracking-tight text-white/70 flex gap-2">
-                <GiRoundShield size={20} className="text-white/70 shrink-0" />
-                Helix AI
-              </span>
+              <div className="flex items-center gap-2 text-[#FAFAFA] text-[17px]">
+                <img
+                  src="https://i.pinimg.com/736x/f6/77/82/f6778272ae65ab1c8a7c42520899250f.jpg"
+                  alt=""
+                  className="w-4 h-4 rounded-[1px]"
+                />
+                Vilo
+              </div>
             )}
           </div>
           <button
@@ -155,7 +159,7 @@ export default function DashboardLayout({
         </nav>
 
         <div className="mt-auto">
-          <div className="border-t border-white/5">
+          <div className="border-t border-[#303030]">
             <div
               className={`w-full flex items-center gap-3 px-4 py-3 ${collapsed ? "justify-center" : ""}`}
             >
@@ -176,7 +180,7 @@ export default function DashboardLayout({
           </div>
           {!collapsed && (
             <div className="px-4 pb-3">
-              <div className="border-t border-white/5 pt-3">
+              <div className="border-t border-[#303030] pt-3">
                 <p className="text-[10px] text-neutral-600 leading-relaxed">
                   By accessing this dashboard, you agree to our terms of
                   service.

@@ -16,7 +16,7 @@ export default function PortfolioRenderer({ data }: Props) {
   ).toUpperCase();
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#14120B]  font-gothic text-white">
+    <div className="flex flex-col min-h-screen bg-black  font-gothic text-white">
       <div className="w-3xl mx-auto px-8 py-10 space-y-10">
         {/* Hero */}
         <div className="flex items-start gap-5 pb-8 border-b border-white/5">

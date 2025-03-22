@@ -52,14 +52,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-stretch bg-[#14120B] font-gothic">
+    <div className="min-h-screen flex items-stretch bg-black font-gothic">
       <div className="hidden lg:block w-1/2 relative overflow-hidden h-screen">
         <img
-          src="https://i.pinimg.com/736x/f6/60/fd/f660fdc0be1bc9faa08799fe28424dae.jpg"
+          src="https://i.pinimg.com/736x/16/36/0d/16360dcaef40261fc2c0f2256ac2bf0d.jpg"
           alt="Login visual"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-bottom opacity-70"
         />
-        <div className="absolute inset-0 bg-black/30" />
       </div>
 
       <div className="w-full lg:w-1/2 flex flex-col items-center justify-between px-8 py-12 h-screen">

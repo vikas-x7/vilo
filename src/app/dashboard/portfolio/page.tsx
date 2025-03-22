@@ -315,7 +315,7 @@ export default function PortfolioPage() {
     (data.skills.length > 0 ? 1 : 0);
 
   return (
-    <div className="flex flex-col h-screen bg-[#14120B] font-gothic text-white overflow-hidden">
+    <div className="flex flex-col h-screen bg-black font-gothic text-white overflow-hidden">
       {/* ── Body ── */}
       <div className="flex flex-1 overflow-hidden relative">
         {/* ── Portfolio Canvas ── */}
@@ -425,7 +425,7 @@ export default function PortfolioPage() {
                   >
                     <button
                       onClick={() => removeItem("experience", e.id)}
-                      className="absolute -left-3 top-0 w-5 h-5 bg-[#14120B] border border-white/10 rounded-full flex items-center justify-center text-white/20 hover:text-red-400 hover:border-red-400/30 opacity-0 group-hover:opacity-100 transition-all"
+                      className="absolute -left-3 top-0 w-5 h-5 bg-black border border-white/10 rounded-full flex items-center justify-center text-white/20 hover:text-red-400 hover:border-red-400/30 opacity-0 group-hover:opacity-100 transition-all"
                     >
                       <FiTrash2 size={9} />
                     </button>
@@ -494,7 +494,7 @@ export default function PortfolioPage() {
                 {data.projects.map((p) => (
                   <div
                     key={p.id}
-                    className="group relative bg-[#1B1913] border border-white/5 rounded-sm p-4 hover:border-white/10 transition-all"
+                    className="group relative bg-[#0A0A0A] border border-white/5 rounded-sm p-4 hover:border-white/10 transition-all"
                   >
                     <button
                       onClick={() => removeItem("projects", p.id)}
@@ -633,7 +633,7 @@ export default function PortfolioPage() {
                   >
                     <button
                       onClick={() => removeItem("education", e.id)}
-                      className="absolute -left-3 top-0 w-5 h-5 bg-[#14120B] border border-white/10 rounded-full flex items-center justify-center text-white/20 hover:text-red-400 hover:border-red-400/30 opacity-0 group-hover:opacity-100 transition-all"
+                      className="absolute -left-3 top-0 w-5 h-5 bg-black border border-white/10 rounded-full flex items-center justify-center text-white/20 hover:text-red-400 hover:border-red-400/30 opacity-0 group-hover:opacity-100 transition-all"
                     >
                       <FiTrash2 size={9} />
                     </button>
@@ -725,7 +725,7 @@ export default function PortfolioPage() {
 
         {/* ── Right Sidebar ── */}
         <div
-          className={`shrink-0 border-l border-white/5 bg-[#171510] overflow-hidden flex flex-col transition-all duration-300 ease-in-out ${
+          className={`shrink-0 border-l border-white/5 bg-black overflow-hidden flex flex-col transition-all duration-300 ease-in-out ${
             rightSidebarOpen ? "w-110" : "w-0 border-l-0"
           }`}
         >
@@ -929,7 +929,7 @@ export default function PortfolioPage() {
             {/* Footer */}
             <div className="p-4 border-t border-white/5 shrink-0">
               <p className="text-[9px] text-white/15 text-center">
-                Helix AI · portfolio builder
+                Vilo · portfolio builder
               </p>
             </div>
           </div>

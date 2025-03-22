@@ -73,12 +73,12 @@ export default function SettingsPanel({
   // ONLY CHANGE HERE (Sidebar width)
   const panelClasses =
     variant === "modal"
-      ? "w-full max-h-[85vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#14120B] font-gothic text-white shadow-[0_28px_80px_rgba(0,0,0,0.45)]"
-      : "h-full w-[280px] overflow-y-auto bg-[#14120B] font-gothic text-white";
+      ? "w-full max-h-[85vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#0A0A0A] font-gothic text-white shadow-[0_28px_80px_rgba(0,0,0,0.45)]"
+      : "h-full w-[280px] overflow-y-auto bg-[#0A0A0A] font-gothic text-white";
 
   const headerClasses =
     variant === "modal"
-      ? "sticky top-0 z-10 border-b border-white/5 bg-[#14120B]/95 px-8 py-6 backdrop-blur"
+      ? "sticky top-0 z-10 border-b border-white/5 bg-[#0A0A0A]/95 px-8 py-6 backdrop-blur"
       : "px-8 py-6 border-b border-white/5";
 
   return (
@@ -270,7 +270,7 @@ export default function SettingsPanel({
       </div>
 
       {showLogoutModal && (
-        <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] bg-[#0A0A0A]/60 flex items-center justify-center p-4">
           <div className="bg-[#1B1913] border border-white/10 rounded-sm w-full max-w-sm p-6">
             <h3 className="text-sm text-white/80 font-medium mb-1">
               Confirm logout
