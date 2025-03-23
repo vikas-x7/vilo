@@ -10,12 +10,12 @@ export const Navbar = () => {
 
   return (
     <>
-      <nav className="relative z-50 flex items-center justify-between px-4 sm:px-6 md:px-10 py-4 w-full max-w-7xl mx-auto border-x border-[#303030] ">
+      <nav className="relative z-50 flex items-center justify-between px-4 sm:px-6 md:px-10 py-2 w-full max-w-7xl mx-auto border-x border-[#303030] ">
         <div className="flex items-center gap-2 text-[#FAFAFA] text-[20px]">
           <img
             src="https://i.pinimg.com/736x/f6/77/82/f6778272ae65ab1c8a7c42520899250f.jpg"
             alt=""
-            className="w-5 h-5 rounded-[1px]"
+            className="w-5 h-5 rounded-[1px] "
           />
           Vilo
         </div>
@@ -25,7 +25,7 @@ export const Navbar = () => {
             <a
               key={item}
               href="#"
-              className="text-sm text-[#FAFAFA] hover:text-[#E6ECEC]/60 transition-colors "
+              className="text-sm text-[#FAFAFA] hover:text-[#E6ECEC]/60 transition-colors"
             >
               {item}
             </a>
@@ -65,7 +65,7 @@ export const Navbar = () => {
         </button>
 
         {menuOpen && (
-          <div className="absolute top-full left-0 right-0 bg-[#1B1913] border-b border-[#38352e] px-6 py-5 flex flex-col gap-4 md:hidden z-50">
+          <div className="absolute  top-full left-0 right-0 bg-[#1B1913] border-b border-[#38352e] px-6 py-5 flex flex-col gap-4 md:hidden z-50">
             {["Home", "About", "Feature", "Pricing"].map((item) => (
               <a
                 key={item}
@@ -79,7 +79,7 @@ export const Navbar = () => {
             <hr className="border-[#38352e]" />
             <Link
               href="/login"
-              className="text-sm font-mono text-[#E6ECEC]/70 hover:text-[#E6ECEC] transition-colors"
+              className="text-sm font-mono text-[#E6ECEC]/70 hover:text-[#E6ECEC] transition-colors "
               onClick={() => setMenuOpen(false)}
             >
               Login

@@ -9,19 +9,20 @@ export const Hero = () => (
   <section className="relative flex flex-col items-center justify-center text-center overflow-hidden mt-16 sm:mt-20 md:mt-24 px-4 sm:px-6 lg:px-8">
     <div className="relative z-10 flex flex-col items-center w-full max-w-3xl mx-auto">
       <div className="flex items-center gap-0 border border-[#303030]  overflow-hidden shadow-sm">
-        <span className="px-3 sm:px-4 py-1.5 text-xs text-[#FAFAFA]  border-r border-[#303030]">
+        <span className="px-3 sm:px-4 py-1.5 text-[10px] text-[#FAFAFA]  border-r border-[#303030]">
           Introducing Vilo
         </span>
         <a
           href="#"
-          className="px-3 sm:px-4 py-1.5 text-xs font-mono bg-[#F5F5F5] text-black  transition-colors flex gap-1.5 items-center justify-center"
+          className="px-3 sm:px-4 py-1.5 text-[10px] bg-[#F5F5F5] text-black  transition-colors flex gap-1.5 items-center justify-center"
         >
           Try now <IoIosArrowRoundForward className="mt-0.5" />
         </a>
       </div>
 
-      <h1 className="text-4xl sm:text-5xl md:text-[57px]  text-[#E6ECEC] leading-[1] -tracking-[3px] mb-6 mt-4 ">
-        LaTeX Documents Developer <br /> Portfolios Learning Roadmaps
+      <h1 className="text-4xl sm:text-5xl md:text-[45px]  text-[#E6ECEC] leading-[1] -tracking-[3px] mb-6 mt-4 ">
+        Latex Documents Developer Portfolios <br />
+        Learning Roadmaps build with vilo
       </h1>
 
       <p className="text-sm text-[#9A9996] max-w-lg mx-auto">
@@ -30,27 +31,20 @@ export const Hero = () => (
       </p>
     </div>
 
-    <div className="relative w-full h-screen max-w-6xl mt-12 sm:mt-16 md:mt-20 px-0">
+    <div className="relative w-full  max-w-6xl mt-12 sm:mt-16 md:mt-20">
       <img
-        className="w-full h-155 rounded-sm opacity-80"
-        src="https://i.pinimg.com/736x/d2/03/23/d2032328af81cb7f3fe4d81c645c4016.jpg"
+        src="https://i.pinimg.com/736x/6b/51/75/6b51750159bbaa442d603a3c860d5e89.jpg"
+        className="w-full h-150 rounded-sm opacity-50 grayscale"
         alt=""
       />
+
       <img
-        className="absolute w-[calc(100%-4.5rem)] rounded-lg"
-        style={{
-          left: "2.25rem",
-          right: "2.25rem",
-          top: "6%",
-          width: "calc(100% - 4.5rem)",
-          borderRadius: "8px",
-        }}
-        src="https://res.cloudinary.com/dyv9kenuj/image/upload/v1771953075/Screenshot_from_2026-02-24_22-40-59_esdabd.png"
+        src="https://res.cloudinary.com/dyv9kenuj/image/upload/q_auto/f_auto/v1775485514/Screenshot_from_2026-04-06_19-53-50_awdwgs.png"
+        className="absolute top-[6%] left-[3.5%] w-[93%] rounded-lg shadow-lg"
         alt=""
       />
     </div>
 
-    {/* Section Heading */}
     <div className="w-full max-w-6xl text-start mt-32 sm:mt-40 md:mt-52 mb-6 px-2">
       <h1 className="text-lg sm:text-xl md:text-[23px] text-[#E6ECEC]/90">
         All the Essential Tools to Create Professional Documents, Showcase{" "}
@@ -64,9 +58,9 @@ export const Hero = () => (
         <img
           src="https://i.pinimg.com/736x/ca/eb/4d/caeb4de0657fb92409b28549d36cabdc.jpg"
           alt="visual"
-          className="w-full h-full object-cover opacity-50"
+          className="w-full h-full object-cover opacity-50 grayscale hover:grayscale-0"
         />
-        <h1 className="absolute bottom-6 left-6 text-white text-[16px]">
+        <h1 className="absolute  bottom-6 left-6 text-white text-[16px]">
           Platform Features
         </h1>
       </div>
@@ -154,7 +148,7 @@ export const Hero = () => (
         </p>
         <Link
           href="/login"
-          className="px-5 py-1.5 bg-[#F0EDE7] text-black text-sm font-medium rounded-sm hover:bg-stone-700 transition-colors font-mono tracking-wide"
+          className="px-5 py-1.5 bg-[#F0EDE7] text-black text-sm font-medium rounded-[2px] hover:bg-stone-700 transition-colors  tracking-wide"
         >
           Get started now
         </Link>
