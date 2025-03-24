@@ -4,6 +4,9 @@ import { QueryProvider } from "@/providers/QueryProvider";
 
 export const metadata: Metadata = {
   title: "Vilo",
+  icons: {
+    icon: "/image/icon.png",
+  },
 };
 export default function RootLayout({
   children,

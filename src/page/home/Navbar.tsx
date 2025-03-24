@@ -13,7 +13,7 @@ export const Navbar = () => {
       <nav className="relative z-50 flex items-center justify-between px-4 sm:px-6 md:px-10 py-2 w-full max-w-7xl mx-auto border-x border-[#303030] ">
         <div className="flex items-center gap-2 text-[#FAFAFA] text-[20px]">
           <img
-            src="https://i.pinimg.com/736x/f6/77/82/f6778272ae65ab1c8a7c42520899250f.jpg"
+            src="/image/icon.png"
             alt=""
             className="w-5 h-5 rounded-[1px] "
           />

@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Vilo
+
+Vilo is an all-in-one platform for developers to create LaTeX documents, build portfolios, follow learning roadmaps, apply for jobs, and use AI tools to improve their workflow and productivity.
+
+The platform is designed to help developers learn, build, document, and get job .
+
+## live demo
+
+https://vilo-wine.vercel.app/
+
+## What You Can Do With Vilo
+
+- Create and edit LaTeX documents
+- Build and manage developer portfolios
+- Follow structured learning roadmaps
+- Apply for jobs
+- Use AI to generate and improve content
+- Export documents as PDF or LaTeX
+  Manage projects and documents in one workspace
+
+### Features
+
+1. LaTeX Document Editor
+2. Developer Portfolio Builder
+3. Learning Roadmaps
+4. Job Application System
+5. AI Features
+
+## Tech Stack
+
+| Layer              | Technology                                       |
+| :----------------- | :----------------------------------------------- |
+| **Frontend**       | Next.js, Tailwind CSS, Monaco Editor, React Flow |
+| **Backend**        | Next.js API Routes, Prisma ORM, PostgreSQL       |
+| **AI Integration** | Vercel AI SDK, Google AI                         |
+| **Icons & Style**  | Lucide Icons, KaTeX                              |
+| **Validation**     | Zod, TypeScript                                  |
+
+---
+
+## Preview
+
+---
 
 ## Getting Started
 
-First, run the development server:
+Follow these steps to set up Vilo locally:
+
+### 1. Clone the repo
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone [https://github.com/your-username/vilo.git]
+
+cd vilo
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Install dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+bun install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Environment Variables
 
-## Learn More
+#### Create a .env file in the root directory and add the following:
 
-To learn more about Next.js, take a look at the following resources:
+```
+Code snippet
+DATABASE_URL="your-postgresql-url"
+NEXTAUTH_SECRET="your-secret"
+GOOGLE_CLIENT_ID="your-google-id"
+GOOGLE_CLIENT_SECRET="your-google-secret"
+OPENAI_API_KEY="your-openai-key"
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Run the app
 
-## Deploy on Vercel
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Development mode
+npm run dev
+```
+
+## Build and Start
+
+```
+bun run build
+```
+
+## Contributing
+
+Contributions are welcome. Fork the repository, clone it locally, create a new branch, make your changes, and submit a pull request. Please ensure your code follows the project structure and coding style.
+
+## Show your support
+
+Give a ⭐️ if this project helped you!
+
+## License
+
+Distributed under the MIT License.

@@ -20,9 +20,9 @@ export const Hero = () => (
         </a>
       </div>
 
-      <h1 className="text-4xl sm:text-5xl md:text-[45px]  text-[#E6ECEC] leading-[1] -tracking-[3px] mb-6 mt-4 ">
-        Latex Documents Developer Portfolios <br />
-        Learning Roadmaps build with vilo
+      <h1 className="text-4xl sm:text-5xl md:text-[45px]  text-[#E6ECEC] leading-[1] -tracking-[2px] mb-6 mt-4 ">
+        Latex documents developer portfolios <br />
+        learning roadmaps build with vilo
       </h1>
 
       <p className="text-sm text-[#9A9996] max-w-lg mx-auto">

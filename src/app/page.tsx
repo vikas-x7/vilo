@@ -1,7 +1,7 @@
 import Footer from "@/page/home/Footer";
 import { Hero } from "@/page/home/Homepage";
 import MarqueeSection from "@/page/home/MarqueeSection";
-import { Navbar } from "@/page/home/Navbat";
+import { Navbar } from "@/page/home/Navbar";
 
 export default function Page() {
   return (

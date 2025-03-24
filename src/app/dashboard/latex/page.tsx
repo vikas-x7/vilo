@@ -221,7 +221,7 @@ export default function LatexPage() {
                 className="group relative flex flex-col bg-[#1B1913] border border-white/5 rounded-sm overflow-hidden hover:border-white/15 transition-all duration-300 aspect-[3/4]"
               >
                 {/* Mock paper preview */}
-                <div className="flex-1 flex flex-col items-center justify-center bg-[#0F0E09] p-4 gap-1.5">
+                <div className="flex-1 flex flex-col items-center justify-center bg-[#0F0E09] p-4 gap-1.5 ">
                   <FiFileText size={28} className="text-white/15" />
                   <div className="w-full space-y-1.5 mt-2">
                     {[80, 60, 70, 50, 65].map((w, i) => (
