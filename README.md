@@ -4,6 +4,8 @@ Vilo is an all-in-one platform for developers to create LaTeX documents, build p
 
 The platform is designed to help developers learn, build, document, and get job .
 
+<img src="https://res.cloudinary.com/dyv9kenuj/image/upload/q_auto/f_auto/v1775499144/Screenshot_from_2026-04-06_23-42-03_xfq86r.png" alt="Dashboard" width="full"/>
+
 ## live demo
 
 https://vilo-wine.vercel.app/
