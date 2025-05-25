@@ -34,7 +34,7 @@ export const Hero = () => (
     <div className="relative w-full  max-w-6xl mt-12 sm:mt-16 md:mt-20">
       <img
         src="https://i.pinimg.com/736x/6b/51/75/6b51750159bbaa442d603a3c860d5e89.jpg"
-        className="w-full h-150 rounded-sm opacity-50 grayscale"
+        className="w-full h-150 rounded-sm opacity-50"
         alt=""
       />
 
@@ -58,7 +58,7 @@ export const Hero = () => (
         <img
           src="https://i.pinimg.com/736x/ca/eb/4d/caeb4de0657fb92409b28549d36cabdc.jpg"
           alt="visual"
-          className="w-full h-full object-cover opacity-50 grayscale hover:grayscale-0"
+          className="w-full h-full object-cover opacity-50"
         />
         <h1 className="absolute  bottom-6 left-6 text-white text-[16px]">
           Platform Features

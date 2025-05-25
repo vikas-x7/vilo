@@ -8,7 +8,7 @@ export default function Page() {
     <>
       <div className=" bg-black  flex justify-center font-gothic ">
         <div className="fixed top-0 left-0 w-full border-dashed border-b border-[#303030] z-50 bg-black   ">
-          <MarqueeSection />
+          {/* <MarqueeSection /> */}
           <div className="max-w-7xl mx-auto">
             <Navbar />
           </div>

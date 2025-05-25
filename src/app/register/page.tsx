@@ -57,7 +57,7 @@ export default function RegisterPage() {
         <img
           src="https://i.pinimg.com/736x/16/36/0d/16360dcaef40261fc2c0f2256ac2bf0d.jpg"
           alt="Login visual"
-          className="w-full h-full object-cover object-bottom opacity-70 grayscale hover:grayscale-0"
+          className="w-full h-full object-cover object-bottom opacity-70"
         />
       </div>
 

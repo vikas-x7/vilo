@@ -542,8 +542,8 @@ function EditorPanel({
   const canFixWithAi = Boolean(compileLogs.trim());
 
   return (
-    <div className="relative flex flex-col h-screen bg-[#0F0E09] font-gothic overflow-hidden text-white">
-      <div className="flex items-center justify-between px-4 bg-[#1B1913] border-b border-white/5 shrink-0 h-11 gap-4">
+    <div className="relative flex flex-col h-screen  font-gothic overflow-hidden text-white">
+      <div className="flex items-center justify-between px-4  border-b border-white/5 shrink-0 h-11 gap-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <Link
             href="/dashboard/latex"
