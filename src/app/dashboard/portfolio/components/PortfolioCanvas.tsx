@@ -22,7 +22,7 @@ export function PortfolioCanvas({ data, avatarFallback, uploadingAvatar, avatarR
     <div className="flex-1 overflow-y-auto">
       <div className="max-w-2xl mx-auto px-8 py-10 space-y-10">
         {/* Hero */}
-        <div className="flex items-start gap-5 pb-8 border-b border-white/5">
+        <div className="flex items-start gap-5 ">
           <div className="relative group shrink-0">
             {data.avatar ? (
               <img src={data.avatar} alt="avatar" className={`w-20 h-20 rounded-full border border-white/10 object-cover ${uploadingAvatar ? 'opacity-50' : ''}`} />
@@ -54,7 +54,8 @@ export function PortfolioCanvas({ data, avatarFallback, uploadingAvatar, avatarR
 
         {/* Skills */}
         <div>
-          <SectionLabel>Skills</SectionLabel>
+          <SectionLabel >Skills</SectionLabel>
+          
           <div className="flex flex-wrap gap-2">
             {data.skills.map((s, i) => (
               <SkillTag
@@ -76,7 +77,7 @@ export function PortfolioCanvas({ data, avatarFallback, uploadingAvatar, avatarR
             ))}
             <button
               onClick={() => setField('skills', [...data.skills, 'New Skill'])}
-              className="flex items-center gap-1 px-2 py-0.5 text-[10px] border border-dashed border-white/10 text-white/25 rounded-sm hover:border-white/20 hover:text-white/50 transition-all"
+              className="flex cursor-pointer items-center gap-1 px-2 py-0.5 text-[13px] border border-dashed border-white/10 text-white/25 rounded-sm hover:border-white/20 hover:text-white/50 transition-all"
             >
               <FiPlus size={9} /> Add
             </button>
