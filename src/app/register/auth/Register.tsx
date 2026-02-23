@@ -8,86 +8,85 @@ import { registerSchema } from "@/modules/auth/auth.validator";
 import Link from "next/link";
 
 export default function RegisterPage() {
-    const router = useRouter();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [validationError, setValidationError] = useState<string | null>(null);
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-    const registerMutation = useMutation({
-        mutationFn: authService.register,
-        onSuccess: () => {
-            // You can redirect to login or dashboard directly depending on API behavior
-            router.push("/login");
-        },
-    });
+  const registerMutation = useMutation({
+    mutationFn: authService.register,
+    onSuccess: () => {
+      router.push("/login");
+    },
+  });
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        setValidationError(null);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setValidationError(null);
 
-        const result = registerSchema.safeParse({ email, password });
-        if (!result.success) {
-            setValidationError(result.error.issues[0]?.message || "Invalid input");
-            return;
-        }
+    const result = registerSchema.safeParse({ email, password });
+    if (!result.success) {
+      setValidationError(result.error.issues[0]?.message || "Invalid input");
+      return;
+    }
 
-        registerMutation.mutate({ email, password });
-    };
+    registerMutation.mutate({ email, password });
+  };
 
-    return (
-        <div style={{ maxWidth: 400, margin: "100px auto" }}>
-            <h2>Register</h2>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8">
+        <h2 className="text-2xl font-bold text-center mb-6">Create Account</h2>
 
-            <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: 12 }}>
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        style={{ width: "100%", padding: 8 }}
-                    />
-                </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <input
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+            />
+          </div>
 
-                <div style={{ marginBottom: 12 }}>
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        style={{ width: "100%", padding: 8 }}
-                    />
-                </div>
+          <div>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+            />
+          </div>
 
-                {validationError && (
-                    <p style={{ color: "red", marginBottom: 12 }}>{validationError}</p>
-                )}
+          {validationError && (
+            <p className="text-sm text-red-500">{validationError}</p>
+          )}
 
-                {registerMutation.isError && (
-                    <p style={{ color: "red", marginBottom: 12 }}>
-                        {(registerMutation.error as Error).message}
-                    </p>
-                )}
+          {registerMutation.isError && (
+            <p className="text-sm text-red-500">
+              {(registerMutation.error as Error).message}
+            </p>
+          )}
 
-                <button
-                    type="submit"
-                    disabled={registerMutation.isPending}
-                    style={{ width: "100%", padding: 10, marginBottom: 12 }}
-                >
-                    {registerMutation.isPending ? "Registering..." : "Register"}
-                </button>
-            </form>
+          <button
+            type="submit"
+            disabled={registerMutation.isPending}
+            className="w-full bg-black text-white py-2 rounded-lg font-medium hover:opacity-90 transition disabled:opacity-60"
+          >
+            {registerMutation.isPending ? "Registering..." : "Register"}
+          </button>
+        </form>
 
-            <div style={{ textAlign: "center", marginTop: 12 }}>
-                <p>
-                    Already have an account?{" "}
-                    <Link href="/login" style={{ color: "blue", textDecoration: "underline" }}>
-                        Login
-                    </Link>
-                </p>
-            </div>
-        </div>
-    );
+        <p className="text-center text-sm text-gray-600 mt-6">
+          Already have an account?{" "}
+          <Link href="/login" className="text-black font-medium underline">
+            Login
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
 }
