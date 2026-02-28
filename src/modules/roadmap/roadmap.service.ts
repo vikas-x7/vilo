@@ -1,55 +1,50 @@
 import { roadmapRepository } from "./roadmap.repository";
-import { CreateRoadmapInput } from "./roadmap.validator";
-import { Prisma } from "@/lib/prisma";
+import { CreateRoadmapInput } from "./validation";
+import { AuthUser } from "@/lib/auth";
+
+function generateSlug(title: string): string {
+  return title.toLowerCase().replace(/\s+/g, "-");
+}
 
 export const roadmapService = {
-  async adminCreate(title: string, data: Prisma.InputJsonValue) {
-    return roadmapRepository.create(title, data);
-  },
-
-  async adminGetAll() {
+  async getAll() {
     return roadmapRepository.findAll();
   },
 
-  async adminDelete(id: number) {
-    return roadmapRepository.delete(id);
+  async getBySlug(slug: string) {
+    const roadmap = await roadmapRepository.findBySlug(slug);
+    if (!roadmap) {
+      throw new Error("Roadmap not found");
+    }
+    return roadmap;
   },
 
-  async getAllForUser(userId: number) {
-    const roadmaps = await roadmapRepository.findAll();
-    const bookmarks = await roadmapRepository.getUserBookmarks(userId);
+  async create(user: AuthUser, dto: CreateRoadmapInput) {
+    if (!user.isAdmin) {
+      throw new Error("Unauthorized");
+    }
 
-    const bookmarkedSet = new Set(bookmarks.map((b: { roadmapId: number }) => b.roadmapId));
+    const slug = generateSlug(dto.title);
 
-    return roadmaps.map((r: any) => ({
-      ...r,
-      isBookmarked: bookmarkedSet.has(r.id),
-    }));
+    return roadmapRepository.create({
+      ...dto,
+      slug,
+    });
   },
 
-  async getSingleForUser(userId: number, id: number) {
-    const roadmap = await roadmapRepository.findById(id);
-    if (!roadmap) throw new Error("Roadmap not found");
+  async update(user: AuthUser, slug: string, dto: Partial<CreateRoadmapInput>) {
+    if (!user.isAdmin) {
+      throw new Error("Unauthorized");
+    }
 
-    const bookmarks = await roadmapRepository.getUserBookmarks(userId);
-    const bookmarkedSet = new Set(bookmarks.map((b: { roadmapId: number }) => b.roadmapId));
-
-    return {
-      ...roadmap,
-      isBookmarked: bookmarkedSet.has(roadmap.id),
-    };
+    return roadmapRepository.update(slug, dto);
   },
 
-  async bookmark(userId: number, roadmapId: number) {
-    return roadmapRepository.createBookmark(userId, roadmapId);
-  },
+  async delete(user: AuthUser, slug: string) {
+    if (!user.isAdmin) {
+      throw new Error("Unauthorized");
+    }
 
-  async removeBookmark(userId: number, roadmapId: number) {
-    return roadmapRepository.removeBookmark(userId, roadmapId);
-  },
-
-  async getMyBookmarks(userId: number) {
-    const rows = await roadmapRepository.getBookmarkedRoadmaps(userId);
-    return rows.map((r: any) => r.roadmap);
+    return roadmapRepository.delete(slug);
   },
 };

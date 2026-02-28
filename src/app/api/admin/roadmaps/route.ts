@@ -1,10 +1,7 @@
-import { roadmapController } from "@/modules/roadmap";
 import { NextRequest } from "next/server";
-
-export async function GET() {
-  return roadmapController.adminGetAll();
-}
+import { roadmapController } from "@/modules/roadmap/roadmap.controller";
 
 export async function POST(req: NextRequest) {
-  return roadmapController.adminCreate(req);
+  const data = await roadmapController.create(req);
+  return Response.json(data);
 }

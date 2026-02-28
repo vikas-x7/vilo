@@ -1,58 +1,37 @@
-import { prisma, Prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export const roadmapRepository = {
-  create(title: string, data: Prisma.InputJsonValue) {
-    return prisma.roadmap.create({
-      data: { title, data },
-    });
-  },
-
   findAll() {
     return prisma.roadmap.findMany({
-      orderBy: { createdAt: "desc" },
-    });
-  },
-
-  findById(id: number) {
-    return prisma.roadmap.findUnique({
-      where: { id },
-    });
-  },
-
-  delete(id: number) {
-    return prisma.roadmap.delete({
-      where: { id },
-    });
-  },
-
-  getUserBookmarks(userId: number) {
-    return prisma.roadmapBookmark.findMany({
-      where: { userId },
-      select: { roadmapId: true },
-    });
-  },
-
-  createBookmark(userId: number, roadmapId: number) {
-    return prisma.roadmapBookmark.create({
-      data: { userId, roadmapId },
-    });
-  },
-
-  removeBookmark(userId: number, roadmapId: number) {
-    return prisma.roadmapBookmark.delete({
-      where: {
-        userId_roadmapId: {
-          userId,
-          roadmapId,
-        },
+      select: {
+        title: true,
+        slug: true,
+        description: true,
       },
     });
   },
 
-  getBookmarkedRoadmaps(userId: number) {
-    return prisma.roadmapBookmark.findMany({
-      where: { userId },
-      include: { roadmap: true },
+  findBySlug(slug: string) {
+    return prisma.roadmap.findUnique({
+      where: { slug },
+    });
+  },
+
+  create(data: Prisma.RoadmapCreateInput) {
+    return prisma.roadmap.create({ data });
+  },
+
+  update(slug: string, data: Prisma.RoadmapUpdateInput) {
+    return prisma.roadmap.update({
+      where: { slug },
+      data,
+    });
+  },
+
+  delete(slug: string) {
+    return prisma.roadmap.delete({
+      where: { slug },
     });
   },
 };
