@@ -1,10 +1,11 @@
 import { roadmapController } from "@/modules/roadmap/roadmap.controller";
 
 interface Params {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export async function GET(_: Request, { params }: Params) {
-  const data = await roadmapController.getBySlug(params.slug);
+  const { slug } = await params;
+  const data = await roadmapController.getBySlug(slug);
   return Response.json(data);
 }
