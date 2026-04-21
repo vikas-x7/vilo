@@ -71,7 +71,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {!collapsed && (
               <div className="flex items-center gap-2 text-[#FAFAFA] text-[17px]">
                 <img src="https://i.pinimg.com/736x/f6/77/82/f6778272ae65ab1c8a7c42520899250f.jpg" alt="" className="w-4 h-4 rounded-[1px]" />
-                Vilo
+                Helix AI
               </div>
             )}
           </div>

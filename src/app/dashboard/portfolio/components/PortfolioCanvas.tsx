@@ -136,10 +136,10 @@ export function PortfolioCanvas({ data, avatarFallback, uploadingAvatar, avatarR
           <SectionLabel>Projects</SectionLabel>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {data.projects.map((p) => (
-              <div key={p.id} className="group relative bg-[#0A0A0A] border border-white/5 rounded-sm p-4 hover:border-white/10 transition-all">
+              <div key={p.id} className="group relative bg-[#0A0A0A] border border-white/5 rounded-sm p-6 hover:border-white/10 transition-all">
                 <button
                   onClick={() => removeItem('projects', p.id)}
-                  className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center text-white/20 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                  className="absolute top-0 right-2 w-4 h-4 flex items-center justify-center text-white/20 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
                 >
                   <FiTrash2 size={10} />
                 </button>

@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import { QueryProvider } from "@/providers/QueryProvider";
+import type { Metadata } from 'next';
+import './globals.css';
+import { QueryProvider } from '@/providers/QueryProvider';
 
 export const metadata: Metadata = {
-  title: "Vilo",
+  title: 'Helix AI',
   icons: {
-    icon: "/image/icon.png",
+    icon: '/image/icon.png',
   },
 };
 export default function RootLayout({

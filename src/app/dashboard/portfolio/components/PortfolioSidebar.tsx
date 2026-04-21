@@ -194,7 +194,7 @@ export function PortfolioSidebar({
 
           {/* Footer */}
           <div className="p-4 border-t border-white/5 shrink-0">
-            <p className="text-[9px] text-white/15 text-center">Vilo · portfolio builder</p>
+            <p className="text-[9px] text-white/15 text-center">Helix AI · portfolio builder</p>
           </div>
         </div>
       </div>

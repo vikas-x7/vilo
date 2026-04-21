@@ -372,7 +372,7 @@ export default function LatexEditorPage({ docId, templateId }: { docId: string |
                 insertSpaces: true,
                 wordWrap: 'off',
               }}
-              theme="vilo-monaco"
+              theme="helix-ai-monaco"
               value={latexCode}
               width="100%"
             />

@@ -123,7 +123,7 @@ export const configureLatexEditor: BeforeMount = (monaco) => {
     });
   }
 
-  monaco.editor.defineTheme('vilo-monaco', {
+  monaco.editor.defineTheme('helix-ai-monaco', {
     base: 'vs-dark',
     inherit: true,
     rules: [
